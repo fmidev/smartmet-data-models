@@ -1,0 +1,196 @@
+#!/bin/sh 
+
+# Set base directory
+if [ -d /smartmet ]; then
+    BASE=/smartmet
+else
+    BASE=$HOME/smartmet
+fi
+
+while getopts  "a:dm:p:" flag
+do
+    case "$flag" in
+	a) AREA=$OPTARG;;
+	m) MODEL=$OPTARG;;
+        p) PROJECTION=$OPTARG;;
+    esac
+done
+
+# Load Configuration
+if [ -s $BASE/cnf/data/${MODEL}.cnf ]; then
+    . $BASE/cnf/data/${MODEL}.cnf
+fi
+
+if [ -z "$AREA" ]; then
+    AREA=world
+fi
+
+if [ -z "$MODEL_RUN_STEP" ]; then
+    MODEL_RUN_STEP=12
+fi
+
+# Use log file if not run interactively
+if [ $TERM = "dumb" ]; then
+    exec &> $LOGFILE
+fi
+
+if [ -z "$PROJECTION" ]; then
+    PROJECTION=""
+else
+    PROJECTION="-P $PROJECTION"
+fi
+
+if [ -z "$CROP" ]; then
+    CROP=""
+else
+    CROP="-G $CROP"
+fi
+
+
+CONVERT_OPTIONS="$CROP $PROJECTION -C"
+
+
+latest() {
+    DIR=$1
+    NAME=$2
+    FILE=$(find $DIR -name "$NAME" -type f -printf '%T@ %P\n' | sort -n | awk '{print $2}'|tail -1)
+    date -u +%s -d "$(grib_get -F %04d -p dataDate:i,dataTime:i $DIR/$FILE | sort -nu | tail -1 )"
+}
+
+
+# Model Reference Time
+#RT=`date -u +%s -d '-5 hours'`
+#RT="$(( $RT / ($MODEL_RUN_STEP * 3600) * ($MODEL_RUN_STEP * 3600) ))"
+RT=$(eval latest $MODEL_RAW_ROOT $MODEL_RAW_MASK)
+RT_HOUR=`date -u -d@$RT +%H`
+RT_DATE_MMDD=`date -u -d@$RT +%Y%m%d`
+RT_DATE_MMDDHH=`date -u -d@$RT +%m%d%H`
+RT_DATE_DDHH=`date -u -d@$RT +%d%H00`
+RT_DATE_DDHHMM=`date -u -d@$RT +%d%H00`
+RT_DATE_HH=`date -u -d@$RT +%Y%m%d%H`
+RT_DATE_HHMM=`date -u -d@$RT +%Y%m%d%H%M`
+RT_YYMMDD_HHMM=`date -u -d@$RT +%y%m%d%H%M`
+RT_DATE_HHMMSS=`date -u -d@$RT +%Y%m%d%H%M%S`
+RT_ISO=`date -u -d@$RT +%Y-%m-%dT%H:%M:%SZ`
+
+
+OUT=$BASE/data/$MODEL/$AREA
+CNF=$BASE/run/data/$MODEL/cnf
+EDITOR=$BASE/editor/in
+TMP=$BASE/tmp/data/test_${MODEL}_${AREA}_${RT_DATE_HHMM}
+
+mkdir -p $TMP
+
+OUTNAME=${RT_DATE_HHMM}_${MODEL}_${AREA}
+
+OUTFILE_SFC=$OUT/surface/querydata/${OUTNAME}_surface.sqd
+OUTFILE_PL=$OUT/pressure/querydata/${OUTNAME}_pressure.sqd
+OUTFILE_ML=$OUT/hybrid/querydata/${OUTNAME}_hybrid.sqd
+
+log() {
+    echo "$(date -u +%H:%M:%S) $1"
+}
+
+#
+# Distribute files if valid
+# Globals: $TMP
+# Arguments: outputfile with path
+#
+distribute() {
+    local TMPFILE=$1
+    local OUTFILE=$2
+    
+    if [ -s $TMPFILE ]; then
+	log "Testing: $(basename $OUTFILE)"
+	if qdstat $TMPFILE; then
+            log  "Compressing: $(basename $OUTFILE)"
+            lbzip2 -k $TMPFILE
+            log "Moving: $(basename $OUTFILE) to $OUTFILE"
+            mv -f $TMPFILE $OUTFILE
+            log "Moving: $(basename $OUTFILE).bz2 to $EDITOR/"
+            mv -f $TMPFILE.bz2 $EDITOR/
+	else
+            log "File $TMPFILE is not valid qd file."
+	fi
+    fi
+}
+
+convert() {
+    local MODEL=$1
+    local MODEL_ID=$2
+#    local OPTIONS=$3
+    local GRB=$3
+    local SQD=$4
+
+    
+    if [[ $SQD == *"surface"* ]]; then
+	LEVEL=surface
+	LEVEL_ID=1
+    elif [[ $SQD == *"pressure"* ]]; then
+	LEVEL=pressure
+	LEVEL_ID=100
+    fi
+
+    PRODUCER="${MODEL_ID},${MODEL^^} ${LEVEL^}"
+
+    log "Converting $LEVEL grib files to $(basename $SQD)"
+    gribtoqd -d -t -L $LEVEL_ID \
+    -c $CNF/${MODEL}-${LEVEL}.cnf \
+    -p "$PRODUCER" \
+    $CONVERT_OPTIONS -o $SQD $GRB 
+    log "Converted surface grib files to $(basename $SQD)"
+    qdinfo -P -x -z -r -q $SQD
+#\$PROJECTION $CROP\
+#    -r 12 \
+
+    # Post Process
+    if [ -s $SQD ] && [ -s $CNF/${MODEL}-${LEVEL}.st ]; then
+        log "Post processing: $(basename $SQD)"
+	qdscript -a 355 -i $SQD $CNF/${MODEL}-${LEVEL}.st > ${SQD}.tmp
+	mv -f  ${SQD}.tmp $SQD
+	qdinfo -P -x -z -r -q $SQD
+    fi
+
+}
+
+
+#
+# Print Information
+# 
+echo "Model Reference Time: $RT_ISO"
+echo "Projection: $PROJECTION"
+echo "Temporary directory: $TMP"
+eval echo "Input data: $MODEL_RAW_ROOT$MODEL_RAW_DIR/$MODEL_RAW_SFC"
+echo "Output directory: $OUT"
+echo "Output surface level file: $(basename $OUTFILE_SFC)"
+echo "Output pressure level file: $(basename $OUTFILE_PL)"
+
+#exit
+
+#
+# Surface Data
+#
+if [ -z $SFCDONE ]; then
+    TMPFILE_SFC=$TMP/$(basename $OUTFILE_SFC)
+
+    eval convert $MODEL $MODEL_ID "$MODEL_RAW_ROOT$MODEL_RAW_DIR/$MODEL_RAW_SFC" $TMPFILE_SFC
+
+    if [ -s $TMPFILE_SFC ]; then
+	log "Creating Wind and Weather objects: $(basename $OUTFILE_SFC)"
+	qdversionchange -a -t 1 -w 1 -i $TMPFILE_SFC 7 > ${TMPFILE_SFC}.tmp
+	mv -f ${TMPFILE_SFC}.tmp $TMPFILE_SFC
+	qdinfo -P -x -z -r -q $TMPFILE_SFC
+    fi
+
+#    distribute $TMPFILE_SFC $OUTFILE_SFC
+
+fi # surface
+
+#
+# Pressure Levels
+#
+if [ -z $PLDONE ]; then
+    TMPFILE_PL=$TMP/$(basename $OUTFILE_PL)
+    eval convert $MODEL $MODEL_ID "$MODEL_RAW_ROOT$MODEL_RAW_DIR/$MODEL_RAW_PL" $TMPFILE_PL
+#    distribute $TMPFILE_PL $OUTFILE_PL
+fi # pressure
