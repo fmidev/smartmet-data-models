@@ -38,6 +38,7 @@ rm -rf $RPM_BUILD_ROOT
 mkdir $RPM_BUILD_ROOT
 cd $RPM_BUILD_ROOT
 
+mkdir -p .%{smartmetroot}/bin
 mkdir -p .%{smartmetroot}/cnf/cron/{cron.d,cron.hourly}
 mkdir -p .%{smartmetroot}/cnf/data
 mkdir -p .%{smartmetroot}/tmp/data/gfs
