@@ -23,12 +23,14 @@ SmartMet data ingest module common
 
 %package ecmwf
 Summary: SmartMet Data ECMWF
+Requires: smartmet-data-models
 
 %description ecmwf
 SmartMet data ingest module for ECMWF model
 
 %package gsm
 Summary: SmartMet Data GSM
+Requires: smartmet-data-models
 
 %description gsm
 SmartMet data ingest module for GSM model
