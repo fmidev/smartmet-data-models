@@ -35,6 +35,13 @@ Requires: smartmet-data-models
 %description gsm
 SmartMet data ingest module for GSM model
 
+%package wrf
+Summary: SmartMet Data WRF
+Requires: smartmet-data-models
+
+%description wrf
+SmartMet data ingest module for WRF model
+
 %install
 rm -rf $RPM_BUILD_ROOT
 mkdir $RPM_BUILD_ROOT
@@ -52,6 +59,8 @@ mkdir -p .%{smartmetroot}/run/data/ecmwf/{bin,cnf}
 install -m 644 %_topdir/SOURCES/smartmet-data-models/ecmwf/ecmwf.cnf %{buildroot}%{smartmetroot}/cnf/data/
 install -m 644 %_topdir/SOURCES/smartmet-data-models/ecmwf/ecmwf.cron %{buildroot}%{smartmetroot}/cnf/cron/cron.d/
 install -m 755 %_topdir/SOURCES/smartmet-data-models/ecmwf/clean_data_ecmwf %{buildroot}%{smartmetroot}/cnf/cron/cron.hourly/
+install -m 644 %_topdir/SOURCES/smartmet-data-models/ecmwf/ecmwf-surface.cnf %{buildroot}%{smartmetroot}/run/data/ecmwf/cnf/
+install -m 644 %_topdir/SOURCES/smartmet-data-models/ecmwf/ecmwf-pressure.cnf %{buildroot}%{smartmetroot}/run/data/ecmwf/cnf/
 
 mkdir -p .%{smartmetroot}/run/data/gsm/{bin,cnf}
 install -m 644 %_topdir/SOURCES/smartmet-data-models/gsm/gsm.cnf %{buildroot}%{smartmetroot}/cnf/data/
@@ -59,6 +68,14 @@ install -m 644 %_topdir/SOURCES/smartmet-data-models/gsm/gsm.cron %{buildroot}%{
 install -m 755 %_topdir/SOURCES/smartmet-data-models/gsm/clean_data_gsm %{buildroot}%{smartmetroot}/cnf/cron/cron.hourly/
 install -m 644 %_topdir/SOURCES/smartmet-data-models/gsm/gsm-surface.cnf %{buildroot}%{smartmetroot}/run/data/gsm/cnf/
 install -m 644 %_topdir/SOURCES/smartmet-data-models/gsm/gsm-pressure.cnf %{buildroot}%{smartmetroot}/run/data/gsm/cnf/
+
+mkdir -p .%{smartmetroot}/run/data/wrf/{bin,cnf}
+install -m 644 %_topdir/SOURCES/smartmet-data-models/wrf/wrf-large.cnf %{buildroot}%{smartmetroot}/cnf/data/
+install -m 644 %_topdir/SOURCES/smartmet-data-models/wrf/wrf-small.cnf %{buildroot}%{smartmetroot}/cnf/data/
+install -m 644 %_topdir/SOURCES/smartmet-data-models/wrf/wrf.cron %{buildroot}%{smartmetroot}/cnf/cron/cron.d/
+install -m 755 %_topdir/SOURCES/smartmet-data-models/wrf/clean_data_wrf %{buildroot}%{smartmetroot}/cnf/cron/cron.hourly/
+install -m 644 %_topdir/SOURCES/smartmet-data-models/wrf/wrf-surface.cnf %{buildroot}%{smartmetroot}/run/data/wrf/cnf/
+install -m 644 %_topdir/SOURCES/smartmet-data-models/wrf/wrf-pressure.cnf %{buildroot}%{smartmetroot}/run/data/wrf/cnf/
 
 # COMMON
 %files
@@ -74,6 +91,8 @@ install -m 644 %_topdir/SOURCES/smartmet-data-models/gsm/gsm-pressure.cnf %{buil
 %config(noreplace) %{smartmetroot}/cnf/data/ecmwf.cnf
 %config(noreplace) %{smartmetroot}/cnf/cron/cron.d/ecmwf.cron
 %config(noreplace) %attr(0755,smartmet,smartmet) %{smartmetroot}/cnf/cron/cron.hourly/clean_data_ecmwf
+%config(noreplace) %{smartmetroot}/run/data/ecmwf/cnf/ecmwf-surface.cnf
+%config(noreplace) %{smartmetroot}/run/data/ecmwf/cnf/ecmwf-pressure.cnf
 
 # GSM
 %files gsm
@@ -81,7 +100,18 @@ install -m 644 %_topdir/SOURCES/smartmet-data-models/gsm/gsm-pressure.cnf %{buil
 %config(noreplace) %{smartmetroot}/cnf/data/gsm.cnf
 %config(noreplace) %{smartmetroot}/cnf/cron/cron.d/gsm.cron
 %config(noreplace) %attr(0755,smartmet,smartmet) %{smartmetroot}/cnf/cron/cron.hourly/clean_data_gsm
-%config(noreplace) %{smartmetroot}/run/data/gsm/cnf/gsm-*.cnf
+%config(noreplace) %{smartmetroot}/run/data/gsm/cnf/gsm-surface.cnf
+%config(noreplace) %{smartmetroot}/run/data/gsm/cnf/gsm-pressure.cnf
+
+# WRF
+%files wrf
+%defattr(-,smartmet,smartmet,-)
+%config(noreplace) %{smartmetroot}/cnf/data/wrf-small.cnf
+%config(noreplace) %{smartmetroot}/cnf/data/wrf-large.cnf
+%config(noreplace) %{smartmetroot}/cnf/cron/cron.d/wrf.cron
+%config(noreplace) %attr(0755,smartmet,smartmet) %{smartmetroot}/cnf/cron/cron.hourly/clean_data_wrf
+%config(noreplace) %{smartmetroot}/run/data/wrf/cnf/wrf-surface.cnf
+%config(noreplace) %{smartmetroot}/run/data/wrf/cnf/wrf-pressure.cnf
 
 %clean
 rm -rf $RPM_BUILD_ROOT
