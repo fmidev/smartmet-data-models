@@ -35,6 +35,13 @@ Requires: smartmet-data-models
 %description gsm
 SmartMet data ingest module for GSM model
 
+%package ukmo
+Summary: SmartMet Data UKMO
+Requires: smartmet-data-models
+
+%description ukmo
+SmartMet data ingest module for UKMO model
+
 %package wrf
 Summary: SmartMet Data WRF
 Requires: smartmet-data-models
@@ -69,6 +76,13 @@ install -m 755 %_topdir/SOURCES/smartmet-data-models/gsm/clean_data_gsm %{buildr
 install -m 644 %_topdir/SOURCES/smartmet-data-models/gsm/gsm-surface.cnf %{buildroot}%{smartmetroot}/run/data/gsm/cnf/
 install -m 644 %_topdir/SOURCES/smartmet-data-models/gsm/gsm-pressure.cnf %{buildroot}%{smartmetroot}/run/data/gsm/cnf/
 
+mkdir -p .%{smartmetroot}/run/data/ukmo/{bin,cnf}
+install -m 644 %_topdir/SOURCES/smartmet-data-models/ukmo/ukmo.cnf %{buildroot}%{smartmetroot}/cnf/data/
+install -m 644 %_topdir/SOURCES/smartmet-data-models/ukmo/ukmo.cron %{buildroot}%{smartmetroot}/cnf/cron/cron.d/
+install -m 755 %_topdir/SOURCES/smartmet-data-models/ukmo/clean_data_ukmo %{buildroot}%{smartmetroot}/cnf/cron/cron.hourly/
+install -m 644 %_topdir/SOURCES/smartmet-data-models/ukmo/ukmo-surface.cnf %{buildroot}%{smartmetroot}/run/data/ukmo/cnf/
+install -m 644 %_topdir/SOURCES/smartmet-data-models/ukmo/ukmo-pressure.cnf %{buildroot}%{smartmetroot}/run/data/ukmo/cnf/
+
 mkdir -p .%{smartmetroot}/run/data/wrf/{bin,cnf}
 #install -m 644 %_topdir/SOURCES/smartmet-data-models/wrf/wrf-large.cnf %{buildroot}%{smartmetroot}/cnf/data/
 #install -m 644 %_topdir/SOURCES/smartmet-data-models/wrf/wrf-small.cnf %{buildroot}%{smartmetroot}/cnf/data/
@@ -102,6 +116,15 @@ install -m 644 %_topdir/SOURCES/smartmet-data-models/wrf/wrf-pressure.cnf %{buil
 %config(noreplace) %attr(0755,smartmet,smartmet) %{smartmetroot}/cnf/cron/cron.hourly/clean_data_gsm
 %config(noreplace) %{smartmetroot}/run/data/gsm/cnf/gsm-surface.cnf
 %config(noreplace) %{smartmetroot}/run/data/gsm/cnf/gsm-pressure.cnf
+
+# UKMO
+%files ukmo
+%defattr(-,smartmet,smartmet,-)
+%config(noreplace) %{smartmetroot}/cnf/data/ukmo.cnf
+%config(noreplace) %{smartmetroot}/cnf/cron/cron.d/ukmo.cron
+%config(noreplace) %attr(0755,smartmet,smartmet) %{smartmetroot}/cnf/cron/cron.hourly/clean_data_ukmo
+%config(noreplace) %{smartmetroot}/run/data/ukmo/cnf/ukmo-surface.cnf
+%config(noreplace) %{smartmetroot}/run/data/ukmo/cnf/ukmo-pressure.cnf
 
 # WRF
 %files wrf
