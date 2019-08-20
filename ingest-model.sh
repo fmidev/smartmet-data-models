@@ -1,5 +1,9 @@
 #!/bin/sh 
 
+log() {
+    echo "$(date -u +%H:%M:%S) $1"
+}
+
 # Set base directory
 if [ -d /smartmet ]; then
     BASE=/smartmet
@@ -7,32 +11,38 @@ else
     BASE=$HOME/smartmet
 fi
 
+# Parse options
 while getopts  "a:dm:p:" flag
 do
     case "$flag" in
 	a) AREA=$OPTARG;;
 	m) MODEL=$OPTARG;;
-        p) PROJECTION=$OPTARG;;
+    p) PROJECTION=$OPTARG;;
     esac
 done
 
-# Load Configuration
-if [ -s $BASE/cnf/data/${MODEL}.cnf ]; then
-    . $BASE/cnf/data/${MODEL}.cnf
+# Defaults
+if [ -z "$MODEL" ]; then
+    MODEL=model
 fi
 
 if [ -z "$AREA" ]; then
     AREA=world
 fi
 
-if [ -z "$MODEL_RUN_STEP" ]; then
-    MODEL_RUN_STEP=12
+# Load configuration file
+# User area configuration if available model-area.cnf
+# Default to model.cnf
+if [ -s $BASE/cnf/data/${MODEL}-${AREA}.cnf ]; then
+    . $BASE/cnf/data/${MODEL}-${AREA}.cnf
+elif [ -s $BASE/cnf/data/${MODEL}.cnf ]; then
+    . $BASE/cnf/data/${MODEL}.cnf
+else
+    log "Neither ${MODEL}-${AREA}.cnf nor ${MODEL}.cnf found in directory $BASE/cnf/data/"   
+    exit 1
 fi
 
-# Use log file if not run interactively
-if [ $TERM = "dumb" ]; then
-    exec &> $LOGFILE
-fi
+
 
 if [ -z "$PROJECTION" ]; then
     PROJECTION=""
@@ -49,7 +59,6 @@ fi
 
 CONVERT_OPTIONS="$CROP $PROJECTION -C"
 
-
 latest() {
     DIR=$1
     NAME=$2
@@ -57,10 +66,7 @@ latest() {
     date -u +%s -d "$(grib_get -F %04d -p dataDate:i,dataTime:i $DIR/$FILE | sort -nu | tail -1 )"
 }
 
-
 # Model Reference Time
-#RT=`date -u +%s -d '-5 hours'`
-#RT="$(( $RT / ($MODEL_RUN_STEP * 3600) * ($MODEL_RUN_STEP * 3600) ))"
 RT=$(eval latest $MODEL_RAW_ROOT $MODEL_RAW_MASK)
 RT_HOUR=`date -u -d@$RT +%H`
 RT_DATE_MMDD=`date -u -d@$RT +%Y%m%d`
@@ -78,6 +84,12 @@ OUT=$BASE/data/$MODEL/$AREA
 CNF=$BASE/run/data/$MODEL/cnf
 EDITOR=$BASE/editor/in
 TMP=$BASE/tmp/data/test_${MODEL}_${AREA}_${RT_DATE_HHMM}
+LOGFILE=$BASE/logs/data/${MODEL}_${AREA}_${RT_HOUR}.log
+
+# Use log file if not run interactively
+if [ $TERM = "dumb" ]; then
+    exec &> $LOGFILE
+fi
 
 mkdir -p $TMP
 
@@ -86,10 +98,6 @@ OUTNAME=${RT_DATE_HHMM}_${MODEL}_${AREA}
 OUTFILE_SFC=$OUT/surface/querydata/${OUTNAME}_surface.sqd
 OUTFILE_PL=$OUT/pressure/querydata/${OUTNAME}_pressure.sqd
 OUTFILE_ML=$OUT/hybrid/querydata/${OUTNAME}_hybrid.sqd
-
-log() {
-    echo "$(date -u +%H:%M:%S) $1"
-}
 
 #
 # Distribute files if valid
