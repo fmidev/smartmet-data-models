@@ -1,0 +1,53 @@
+#
+# Grib to QD Conversion Tables for Centre EGRR
+#
+#
+# ECMWF Parameter Database
+# http://apps.ecmwf.int/codes/grib/param-db
+#
+# List of available SmartMetIDs
+# qdinfo -l
+
+# GribID;SmartMetID;Name;Base;Scale;LevelType;LevelValue;InterpolationMethod
+
+# 1: Mean Sea Level Pressure [Pa]
+151;1;Mean Sea Level Pressure (msl);0;0.01;102;0
+
+# 4: Temperature 0m [K]
+130;288;Temperature 0m (t);-273.15;1;1;0
+
+# 13: Relative Humidity [%]
+157;13;Relative Humidity (r);0;1
+
+# 23: U Component Of Wind [m s**-1]
+131;23;U Component Of Wind (u);0;1
+
+# 24: V Component Of Wind [m s**-1]
+132;24;V Component Of Wind (v);0;1
+
+# 48: Convective Precipitation (water) [kg m**-2]
+3063;48;Convective Precipitation (water) (acpcp);0;1
+
+# 50: Total Precipitation [kg m**-2]
+228228;50;Total Precipitation (tp);0;1
+
+# 165: Signific.height,combined Wind Waves+swell [m]
+3100;165;Signific.height,combined Wind Waves+swell (swh);0;1
+
+# : Direction Of Swell Waves [Degree true]
+#3104;;Direction Of Swell Waves (swdir);0;1
+
+# : Mean Direction Of Wind Waves [Degree true]
+#3101;;Mean Direction Of Wind Waves (mdww);0;1
+
+# : Mean Period Of Swell Waves [s]
+#3106;;Mean Period Of Swell Waves (swper);0;1
+
+# : Mean Period Of Wind Waves [s]
+#3103;;Mean Period Of Wind Waves (mpww);0;1
+
+# : Significant Height Of Swell Waves [m]
+#3105;;Significant Height Of Swell Waves (swell);0;1
+
+# : Significant Height Of Wind Waves [m]
+#3102;;Significant Height Of Wind Waves (shww);0;1
