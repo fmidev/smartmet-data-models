@@ -1,0 +1,6 @@
+#!/bin/sh
+# Clean WRF data
+cleaner -maxfiles 4 '_wrf_.*_surface.sqd' %{smartmetroot}/data/wrf
+cleaner -maxfiles 4 '_wrf_.*_pressure.sqd' %{smartmetroot}/data/wrf
+cleaner -maxfiles 2 '_wrf_.*_surface.sqd' %{smartmetroot}/editor/in
+cleaner -maxfiles 2 '_wrf_.*_pressure.sqd' %{smartmetroot}/editor/in
