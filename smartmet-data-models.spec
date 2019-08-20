@@ -39,11 +39,10 @@ mkdir $RPM_BUILD_ROOT
 cd $RPM_BUILD_ROOT
 
 mkdir -p .%{smartmetroot}/bin
-mkdir -p .%{smartmetroot}/cnf/cron/{cron.d,cron.hourly}
 mkdir -p .%{smartmetroot}/cnf/data
-mkdir -p .%{smartmetroot}/tmp/data/gfs
+mkdir -p .%{smartmetroot}/tmp/data
 mkdir -p .%{smartmetroot}/logs/data
-mkdir -p .%{smartmetroot}/run/data/gfs/{bin,cnf}
+mkdir -p .%{smartmetroot}/cnf/cron/{cron.d,cron.hourly}
 
 install -m 755 %_topdir/SOURCES/smartmet-data-models/ingest-model.sh %{buildroot}%{smartmetroot}/bin/
 
@@ -57,16 +56,22 @@ install -m 644 %_topdir/SOURCES/smartmet-data-models/gsm/gsm.cnf %{buildroot}%{s
 install -m 644 %_topdir/SOURCES/smartmet-data-models/gsm/gsm.cron %{buildroot}%{smartmetroot}/cnf/cron/cron.d/
 install -m 755 %_topdir/SOURCES/smartmet-data-models/gsm/clean_data_gsm %{buildroot}%{smartmetroot}/cnf/cron/cron.hourly/
 
+# COMMON
 %files
 %defattr(-,smartmet,smartmet,-)
-%{smartmetroot}/*
+%{smartmetroot}/bin/*
+%{smartmetroot}/cnf/data
+%{smartmetroot}/tmp/data
+%{smartmetroot}/logs/data
 
+# ECMWF
 %files ecmwf
 %defattr(-,smartmet,smartmet,-)
 %config(noreplace) %{smartmetroot}/cnf/data/ecmwf.cnf
 %config(noreplace) %{smartmetroot}/cnf/cron/cron.d/ecmwf.cron
 %config(noreplace) %attr(0755,smartmet,smartmet) %{smartmetroot}/cnf/cron/cron.hourly/clean_data_ecmwf
 
+# GSM
 %files gsm
 %defattr(-,smartmet,smartmet,-)
 %config(noreplace) %{smartmetroot}/cnf/data/gsm.cnf
