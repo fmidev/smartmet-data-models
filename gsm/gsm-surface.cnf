@@ -1,0 +1,44 @@
+#
+# Grib to QD Conversion Tables for Centre RJTD
+#
+#
+# ECMWF Parameter Database
+# http://apps.ecmwf.int/codes/grib/param-db
+#
+# List of available SmartMetIDs
+# qdinfo -l
+
+# GribID;SmartMetID;Name;Base;Scale;LevelType;LevelValue;InterpolationMethod
+
+# 1: Pressure Reduced To MSL [Pa]
+260074;1;Pressure Reduced To MSL (prmsl);0;0.01;102;0
+
+# 4: 2 Metre Temperature [K]
+167;4;2 Metre Temperature (2t);-273.15;1;105;2
+
+# 13: 2 Metre Relative Humidity [%]
+260242;13;2 Metre Relative Humidity (2r);0;1;105;2
+
+# 23: 10 Metre U Wind Component [m s**-1]
+165;23;10 Metre U Wind Component (10u);0;1;105;10
+
+# 24: 10 Metre V Wind Component [m s**-1]
+166;24;10 Metre V Wind Component (10v);0;1;105;10
+
+# 273: Low Cloud Cover [%]
+3073;273;Low Cloud Cover (lcc);0;1
+
+# 274: Medium Cloud Cover [%]
+3074;274;Medium Cloud Cover (mcc);0;1
+
+# 275: High Cloud Cover [%]
+3075;275;High Cloud Cover (hcc);0;1
+
+# 472: Surface Pressure [Pa]
+134;472;Surface Pressure (sp);0;0.01
+
+# : Total Cloud Cover [unknown]
+6001;79;Total Cloud Cover (tcc);0;1
+
+# : Total Precipitation [unknown]
+1008;50;Total Precipitation (tp);0;1
