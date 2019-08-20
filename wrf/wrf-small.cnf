@@ -1,0 +1,10 @@
+MODEL=wrf
+MODEL_ID=60
+MODEL_RAW_ROOT='/smartmet/tmp/data/wrf/kyrgyzstan/d02'
+MODEL_RAW_DIR='/$RT_DATE_HHMM/grib'
+MODEL_RAW_SFC='$RT_YYMMDD_HHMM\*'
+MODEL_RAW_PL='$RT_YYMMDD_HHMM\*'
+
+MODEL_RAW_MASK='\*wrfout_arw_d02.grb2\*'
+
+AREA=small
