@@ -1,0 +1,6 @@
+#!/bin/sh
+# Clean GFS data
+cleaner -maxfiles 4 '_gfs_.*_surface.sqd' %{smartmetroot}/data/gfs
+cleaner -maxfiles 4 '_gfs_.*_pressure.sqd' %{smartmetroot}/data/gfs
+cleaner -maxfiles 2 '_gfs_.*_surface.sqd' %{smartmetroot}/editor/in
+cleaner -maxfiles 2 '_gfs_.*_pressure.sqd' %{smartmetroot}/editor/in

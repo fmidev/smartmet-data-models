@@ -1,0 +1,6 @@
+#!/bin/sh
+# Clean ECMWF data
+cleaner -maxfiles 4 '_ecmwf_.*_surface.sqd' %{smartmetroot}/data/ecmwf
+cleaner -maxfiles 4 '_ecmwf_.*_pressure.sqd' %{smartmetroot}/data/ecmwf
+cleaner -maxfiles 2 '_ecmwf_.*_surface.sqd' %{smartmetroot}/editor/in
+cleaner -maxfiles 2 '_ecmwf_.*_pressure.sqd' %{smartmetroot}/editor/in
