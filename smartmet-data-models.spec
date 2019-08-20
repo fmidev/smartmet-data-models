@@ -46,27 +46,25 @@ mkdir -p .%{smartmetroot}/run/data/gfs/{bin,cnf}
 
 install -m 755 %_topdir/SOURCES/smartmet-data-models/ingest-model.sh %{buildroot}%{smartmetroot}/bin/
 
-%files
-%defattr(-,smartmet,smartmet,-)
-%{smartmetroot}/*
-
-%install ecmwf
 mkdir -p .%{smartmetroot}/run/data/ecmwf/{bin,cnf}
 install -m 644 %_topdir/SOURCES/smartmet-data-models/ecmwf/ecmwf.cnf %{buildroot}%{smartmetroot}/cnf/data/
 install -m 644 %_topdir/SOURCES/smartmet-data-models/ecmwf/ecmwf.cron %{buildroot}%{smartmetroot}/cnf/cron/cron.d/
 install -m 755 %_topdir/SOURCES/smartmet-data-models/ecmwf/clean_data_ecmwf %{buildroot}%{smartmetroot}/cnf/cron/cron.hourly/
+
+mkdir -p .%{smartmetroot}/run/data/gsm/{bin,cnf}
+install -m 644 %_topdir/SOURCES/smartmet-data-models/gsm/gsm.cnf %{buildroot}%{smartmetroot}/cnf/data/
+install -m 644 %_topdir/SOURCES/smartmet-data-models/ecmwf/ecmwf.cron %{buildroot}%{smartmetroot}/cnf/cron/cron.d/
+install -m 755 %_topdir/SOURCES/smartmet-data-models/gsm/clean_data_gsm %{buildroot}%{smartmetroot}/cnf/cron/cron.hourly/
+
+%files
+%defattr(-,smartmet,smartmet,-)
+%{smartmetroot}/*
 
 %files ecmwf
 %defattr(-,smartmet,smartmet,-)
 %config(noreplace) %{smartmetroot}/cnf/data/ecmwf.cnf
 %config(noreplace) %{smartmetroot}/cnf/cron/cron.d/ecmwf.cron
 %config(noreplace) %attr(0755,smartmet,smartmet) %{smartmetroot}/cnf/cron/cron.hourly/clean_data_ecmwf
-
-%install gsm
-mkdir -p .%{smartmetroot}/run/data/gsm/{bin,cnf}
-install -m 644 %_topdir/SOURCES/smartmet-data-models/gsm/gsm.cnf %{buildroot}%{smartmetroot}/cnf/data/
-install -m 644 %_topdir/SOURCES/smartmet-data-models/ecmwf/ecmwf.cron %{buildroot}%{smartmetroot}/cnf/cron/cron.d/
-install -m 755 %_topdir/SOURCES/smartmet-data-models/gsm/clean_data_gsm %{buildroot}%{smartmetroot}/cnf/cron/cron.hourly/
 
 %files gsm
 %defattr(-,smartmet,smartmet,-)
