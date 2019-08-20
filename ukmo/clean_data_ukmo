@@ -1,0 +1,6 @@
+#!/bin/sh
+# Clean UKMO data
+cleaner -maxfiles 4 '_ukmo_.*_surface.sqd' %{smartmetroot}/data/ukmo
+cleaner -maxfiles 4 '_ukmo_.*_pressure.sqd' %{smartmetroot}/data/ukmo
+cleaner -maxfiles 2 '_ukmo_.*_surface.sqd' %{smartmetroot}/editor/in
+cleaner -maxfiles 2 '_ukmo_.*_pressure.sqd' %{smartmetroot}/editor/in
