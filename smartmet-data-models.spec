@@ -57,6 +57,8 @@ mkdir -p .%{smartmetroot}/run/data/gsm/{bin,cnf}
 install -m 644 %_topdir/SOURCES/smartmet-data-models/gsm/gsm.cnf %{buildroot}%{smartmetroot}/cnf/data/
 install -m 644 %_topdir/SOURCES/smartmet-data-models/gsm/gsm.cron %{buildroot}%{smartmetroot}/cnf/cron/cron.d/
 install -m 755 %_topdir/SOURCES/smartmet-data-models/gsm/clean_data_gsm %{buildroot}%{smartmetroot}/cnf/cron/cron.hourly/
+install -m 644 %_topdir/SOURCES/smartmet-data-models/gsm/gsm-surface.cnf %{buildroot}%{smartmetroot}/run/data/gsm/cnf/
+install -m 644 %_topdir/SOURCES/smartmet-data-models/gsm/gsm-pressure.cnf %{buildroot}%{smartmetroot}/run/data/gsm/cnf/
 
 # COMMON
 %files
@@ -79,6 +81,7 @@ install -m 755 %_topdir/SOURCES/smartmet-data-models/gsm/clean_data_gsm %{buildr
 %config(noreplace) %{smartmetroot}/cnf/data/gsm.cnf
 %config(noreplace) %{smartmetroot}/cnf/cron/cron.d/gsm.cron
 %config(noreplace) %attr(0755,smartmet,smartmet) %{smartmetroot}/cnf/cron/cron.hourly/clean_data_gsm
+%config(noreplace) %{smartmetroot}/run/data/gsm/cnf/gsm-*.cnf
 
 %clean
 rm -rf $RPM_BUILD_ROOT
