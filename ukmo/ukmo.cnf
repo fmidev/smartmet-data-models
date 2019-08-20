@@ -1,0 +1,10 @@
+MODEL=ukmo
+MODEL_ID=120
+MODEL_RAW_ROOT='/smartmet/data/incoming/gts/ukmo'
+MODEL_RAW_DIR=''
+MODEL_RAW_SFC='\*EGRR\*$RT_DATE_DDHHMM'
+MODEL_RAW_PL='\*EGRR\*$RT_DATE_DDHHMM'
+
+MODEL_RAW_MASK='\*EGRR\*'
+
+AREA=world
