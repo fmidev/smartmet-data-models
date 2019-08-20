@@ -1,0 +1,2 @@
+15 * * * * /smartmet/bin/ingest-data.sh -m wrf -a small
+15 * * * * /smartmet/bin/ingest-data.sh -m wrf -a large
