@@ -1,0 +1,1 @@
+15 * * * * /smartmet/bin/ingest-data.sh -m ecmwf
