@@ -54,7 +54,7 @@ install -m 755 %_topdir/SOURCES/smartmet-data-models/ecmwf/clean_data_ecmwf %{bu
 
 mkdir -p .%{smartmetroot}/run/data/gsm/{bin,cnf}
 install -m 644 %_topdir/SOURCES/smartmet-data-models/gsm/gsm.cnf %{buildroot}%{smartmetroot}/cnf/data/
-install -m 644 %_topdir/SOURCES/smartmet-data-models/ecmwf/gsm.cron %{buildroot}%{smartmetroot}/cnf/cron/cron.d/
+install -m 644 %_topdir/SOURCES/smartmet-data-models/gsm/gsm.cron %{buildroot}%{smartmetroot}/cnf/cron/cron.d/
 install -m 755 %_topdir/SOURCES/smartmet-data-models/gsm/clean_data_gsm %{buildroot}%{smartmetroot}/cnf/cron/cron.hourly/
 
 %files
