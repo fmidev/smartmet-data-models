@@ -106,12 +106,12 @@ install -m 644 %_topdir/SOURCES/smartmet-data-models/wrf/wrf-pressure.cnf %{buil
 # WRF
 %files wrf
 %defattr(-,smartmet,smartmet,-)
-%config(noreplace) %{smartmetroot}/cnf/data/wrf-small.cnf
-%config(noreplace) %{smartmetroot}/cnf/data/wrf-large.cnf
+#%config(noreplace) %{smartmetroot}/cnf/data/wrf-small.cnf
+#%config(noreplace) %{smartmetroot}/cnf/data/wrf-large.cnf
 %config(noreplace) %{smartmetroot}/cnf/cron/cron.d/wrf.cron
 %config(noreplace) %attr(0755,smartmet,smartmet) %{smartmetroot}/cnf/cron/cron.hourly/clean_data_wrf
-#%config(noreplace) %{smartmetroot}/run/data/wrf/cnf/wrf-surface.cnf
-#%config(noreplace) %{smartmetroot}/run/data/wrf/cnf/wrf-pressure.cnf
+%config(noreplace) %{smartmetroot}/run/data/wrf/cnf/wrf-surface.cnf
+%config(noreplace) %{smartmetroot}/run/data/wrf/cnf/wrf-pressure.cnf
 
 %clean
 rm -rf $RPM_BUILD_ROOT
