@@ -109,17 +109,19 @@ distribute() {
     local OUTFILE=$2
     
     if [ -s $TMPFILE ]; then
-	log "Testing: $(basename $OUTFILE)"
-	if qdstat $TMPFILE; then
+	    log "Testing: $(basename $OUTFILE)"
+	    if qdstat $TMPFILE; then
+            log "Creating directory: $(dirname $OUTFILE)"
+            mkdir -p $(dirname $OUTFILE)
             log  "Compressing: $(basename $OUTFILE)"
             lbzip2 -k $TMPFILE
             log "Moving: $(basename $OUTFILE) to $OUTFILE"
             mv -f $TMPFILE $OUTFILE
             log "Moving: $(basename $OUTFILE).bz2 to $EDITOR/"
             mv -f $TMPFILE.bz2 $EDITOR/
-	else
+	    else
             log "File $TMPFILE is not valid qd file."
-	fi
+    	fi
     fi
 }
 
@@ -130,13 +132,19 @@ convert() {
     local GRB=$3
     local SQD=$4
 
+    local OPTIONS=""
     
     if [[ $SQD == *"surface"* ]]; then
-	LEVEL=surface
-	LEVEL_ID=1
+        LEVEL=surface
+        LEVEL_ID=1
     elif [[ $SQD == *"pressure"* ]]; then
-	LEVEL=pressure
-	LEVEL_ID=100
+        LEVEL=pressure
+        LEVEL_ID=100
+
+       	if [ $(grib_get  -p shortName -w  typeOfLevel=isobaricInhPa -w shortName=q $GRB | wc -l) -gt 0 ]; then
+            OPTIONS="$OPTIONS -r 12";
+            log "Enabling RH calculations from Q"
+	    fi
     fi
 
     PRODUCER="${MODEL_ID},${MODEL^^} ${LEVEL^}"
@@ -145,22 +153,20 @@ convert() {
     gribtoqd -d -t -L $LEVEL_ID \
     -c $CNF/${MODEL}-${LEVEL}.cnf \
     -p "$PRODUCER" \
-    $CONVERT_OPTIONS -o $SQD $GRB 
+    $OPTIONS -o $SQD $GRB 
     log "Converted surface grib files to $(basename $SQD)"
-    qdinfo -P -x -z -r -q $SQD
+    qdinfo -P -T -x -z -r -q $SQD
 #\$PROJECTION $CROP\
-#    -r 12 \
 
     # Post Process
     if [ -s $SQD ] && [ -s $CNF/${MODEL}-${LEVEL}.st ]; then
         log "Post processing: $(basename $SQD)"
-	qdscript -a 355 -i $SQD $CNF/${MODEL}-${LEVEL}.st > ${SQD}.tmp
-	mv -f  ${SQD}.tmp $SQD
-	qdinfo -P -x -z -r -q $SQD
+	    qdscript -a 355 -i $SQD $CNF/${MODEL}-${LEVEL}.st > ${SQD}.tmp
+	    mv -f  ${SQD}.tmp $SQD
+	    qdinfo -P -q $SQD
     fi
 
 }
-
 
 #
 # Print Information
