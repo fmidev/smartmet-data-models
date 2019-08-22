@@ -1,4 +1,11 @@
 #!/bin/sh 
+#
+# Finnish Meteorological Institute / Mikko Rauhala (2019)
+#
+# SmartMet Data Ingestion Module
+#
+# Usage: ./ingest-model.sh -m modelname
+#
 
 log() {
     echo "$(date -u +%H:%M:%S) $1"
@@ -11,13 +18,20 @@ else
     BASE=$HOME/smartmet
 fi
 
+if [ $# -eq 0 ]; then
+    echo "OPTIONS\n  -m arg\tmodel\n  -a arg\tarea\n  -t arg\treference time (yyyymmddThh)"
+    exit 1
+fi
+
 # Parse options
-while getopts  "a:dm:p:" flag
+while getopts  "a:dm:p:t:" flag
 do
     case "$flag" in
 	a) AREA=$OPTARG;;
 	m) MODEL=$OPTARG;;
     p) PROJECTION=$OPTARG;;
+    r) RT=$OPTARG;;
+    d) DEBUG=1
     esac
 done
 
@@ -59,6 +73,10 @@ fi
 
 CONVERT_OPTIONS="$CROP $PROJECTION -C"
 
+if [ -s ./update.sh ]; then
+    ./update.sh
+fi
+
 latest() {
     DIR=$1
     NAME=$2
@@ -67,7 +85,11 @@ latest() {
 }
 
 # Model Reference Time
-RT=$(eval latest $MODEL_RAW_ROOT $MODEL_RAW_MASK)
+if [ -z "$RT" ]; then
+    RT=$(eval latest $MODEL_RAW_ROOT $MODEL_RAW_MASK)
+else
+    RT=$(date +%s -d "$RT")
+fi
 RT_HOUR=`date -u -d@$RT +%H`
 RT_DATE_MMDD=`date -u -d@$RT +%Y%m%d`
 RT_DATE_MMDDHH=`date -u -d@$RT +%m%d%H`
@@ -149,6 +171,8 @@ convert() {
 
     PRODUCER="${MODEL_ID},${MODEL^^} ${LEVEL^}"
 
+    log "Creating directory: $(dirname $SQD)"
+    mkdir -p $(dirname $SQD)
     log "Converting $LEVEL grib files to $(basename $SQD)"
     gribtoqd -d -t -L $LEVEL_ID \
     -c $CNF/${MODEL}-${LEVEL}.cnf \
@@ -181,6 +205,8 @@ echo "Output pressure level file: $(basename $OUTFILE_PL)"
 
 #exit
 
+
+
 #
 # Surface Data
 #
@@ -193,7 +219,7 @@ if [ -z $SFCDONE ]; then
 	log "Creating Wind and Weather objects: $(basename $OUTFILE_SFC)"
 	qdversionchange -a -t 1 -w 1 -i $TMPFILE_SFC 7 > ${TMPFILE_SFC}.tmp
 	mv -f ${TMPFILE_SFC}.tmp $TMPFILE_SFC
-	qdinfo -P -x -z -r -q $TMPFILE_SFC
+	qdinfo -P -q $TMPFILE_SFC
     fi
 
 #    distribute $TMPFILE_SFC $OUTFILE_SFC
