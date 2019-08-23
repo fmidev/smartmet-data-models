@@ -56,7 +56,12 @@ else
     exit 1
 fi
 
+LOGFILE=$BASE/logs/data/${MODEL}_${AREA}_$(date -u +%H).log
 
+# Use log file if not run interactively
+if [ $TERM = "dumb" ]; then
+    exec &> $LOGFILE
+fi
 
 if [ -z "$PROJECTION" ]; then
     PROJECTION=""
@@ -106,17 +111,8 @@ OUT=$BASE/data/$MODEL/$AREA
 CNF=$BASE/run/data/$MODEL/cnf
 EDITOR=$BASE/editor/in
 TMP=$BASE/tmp/data/test_${MODEL}_${AREA}_${RT_DATE_HHMM}
-LOGFILE=$BASE/logs/data/${MODEL}_${AREA}_${RT_HOUR}.log
-
-# Use log file if not run interactively
-if [ $TERM = "dumb" ]; then
-    exec &> $LOGFILE
-fi
-
-mkdir -p $TMP
 
 OUTNAME=${RT_DATE_HHMM}_${MODEL}_${AREA}
-
 OUTFILE_SFC=$OUT/surface/querydata/${OUTNAME}_surface.sqd
 OUTFILE_PL=$OUT/pressure/querydata/${OUTNAME}_pressure.sqd
 OUTFILE_ML=$OUT/hybrid/querydata/${OUTNAME}_hybrid.sqd
@@ -261,3 +257,8 @@ if [ -z $PLDONE ]; then
         distribute $TMPFILE_PL $OUTFILE_PL
     fi # debug
 fi # pressure
+
+#
+# Clean
+#
+rmdir $TMP
