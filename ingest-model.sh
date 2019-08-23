@@ -121,6 +121,17 @@ OUTFILE_SFC=$OUT/surface/querydata/${OUTNAME}_surface.sqd
 OUTFILE_PL=$OUT/pressure/querydata/${OUTNAME}_pressure.sqd
 OUTFILE_ML=$OUT/hybrid/querydata/${OUTNAME}_hybrid.sqd
 
+gribstepcount() {
+    local FILES=$1
+    grib_get -p startStep $FILES|sort -nu|wc -l
+}
+
+qdstepcount() {
+    local FILE=$1
+    qdinfo -t -q $FILE | grep Timesteps | cut -d= -f2| tr -d ' '
+}
+
+
 #
 # Distribute files if valid
 # Globals: $TMP
@@ -203,8 +214,20 @@ echo "Output directory: $OUT"
 echo "Output surface level file: $(basename $OUTFILE_SFC)"
 echo "Output pressure level file: $(basename $OUTFILE_PL)"
 
-#exit
 
+if [ -s $OUTFILE_SFC ] && [ $(eval gribstepcount "$MODEL_RAW_ROOT$MODEL_RAW_DIR/$MODEL_RAW_SFC") -eq $(qdstepcount $OUTFILE_SFC) ]; then
+    log "$(basename $OUTFILE_SFC) is complete"
+    SFCDONE=1
+else
+    log "$(basename $OUTFILE_SFC) is incomplete"
+fi
+
+if [ -s $OUTFILE_PL ] && [ $(eval gribstepcount "$MODEL_RAW_ROOT$MODEL_RAW_DIR/$MODEL_RAW_PL") -eq $(qdstepcount $OUTFILE_PL) ]; then
+    log "$(basename $OUTFILE_PL) is complete"
+    PLDONE=1
+else
+    log "$(basename $OUTFILE_PL) is incomplete"
+fi
 
 
 #
