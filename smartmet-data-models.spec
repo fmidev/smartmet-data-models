@@ -2,7 +2,7 @@
 
 Name:           smartmet-data-models
 Version:        19.8.20
-Release:        3%{?dist}.fmi
+Release:        4%{?dist}.fmi
 Summary:        SmartMet Data Models Common
 Group:          System Environment/Base
 License:        MIT

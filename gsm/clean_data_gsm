@@ -1,6 +1,9 @@
 #!/bin/sh
 # Clean GSM data
-cleaner -maxfiles 4 '_gsm_.*_surface.sqd' %{smartmetroot}/data/gsm
-cleaner -maxfiles 4 '_gsm_.*_pressure.sqd' %{smartmetroot}/data/gsm
-cleaner -maxfiles 2 '_gsm_.*_surface.sqd' %{smartmetroot}/editor/in
-cleaner -maxfiles 2 '_gsm_.*_pressure.sqd' %{smartmetroot}/editor/in
+cleaner -maxfiles 4 '_gsm_.*_surface.sqd' /smartmet/data/gsm
+cleaner -maxfiles 4 '_gsm_.*_pressure.sqd' /smartmet/data/gsm
+cleaner -maxfiles 2 '_gsm_.*_surface.sqd' /smartmet/editor/in
+cleaner -maxfiles 2 '_gsm_.*_pressure.sqd' /smartmet/editor/in
+
+# Clean incoming directory older than 1 day (1 * 24 * 60 = 1440 min)
+find /smartmet/data/incoming/gsm -mmin +1440 -delete
