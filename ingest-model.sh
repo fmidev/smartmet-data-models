@@ -76,7 +76,7 @@ else
 fi
 
 
-CONVERT_OPTIONS="$CROP $PROJECTION -C"
+CONVERT_OPTIONS="$CROP $PROJECTION"
 
 if [ -s $BASE/run/data/${MODEL}/bin/update.sh ]; then
     $BASE/run/data/${MODEL}/bin/update.sh
@@ -265,4 +265,6 @@ fi # pressure
 #
 # Clean
 #
-rmdir $TMP
+if [ -d $TMP ]; then
+    rmdir $TMP
+fi
