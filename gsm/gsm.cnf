@@ -1,6 +1,6 @@
 MODEL=gsm
 MODEL_ID=52
-MODEL_RAW_ROOT='/smartmet/data/incoming/gsm/raw_gsm0p50'
+MODEL_RAW_ROOT='/smartmet/data/incoming/gsm'
 MODEL_RAW_DIR='/$RT_DATE_HH'
 MODEL_RAW_SFC='gsm0p5_Lsurf\*'
 MODEL_RAW_PL='gsm0p5_L-pall\*'
