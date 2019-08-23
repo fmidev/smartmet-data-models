@@ -1,1 +1,1 @@
-15 * * * * /smartmet/bin/ingest-data.sh -m ecmwf
+15 * * * * /smartmet/bin/ingest-model.sh -m ecmwf
