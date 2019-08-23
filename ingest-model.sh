@@ -30,7 +30,7 @@ do
 	a) AREA=$OPTARG;;
 	m) MODEL=$OPTARG;;
     p) PROJECTION=$OPTARG;;
-    r) RT=$OPTARG;;
+    t) RT=$OPTARG;;
     d) DEBUG=1
     esac
 done
@@ -222,7 +222,9 @@ if [ -z $SFCDONE ]; then
 	qdinfo -P -q $TMPFILE_SFC
     fi
 
-#    distribute $TMPFILE_SFC $OUTFILE_SFC
+    if [ -z $DEBUG ]; then
+        distribute $TMPFILE_SFC $OUTFILE_SFC
+    fi
 
 fi # surface
 
@@ -232,5 +234,7 @@ fi # surface
 if [ -z $PLDONE ]; then
     TMPFILE_PL=$TMP/$(basename $OUTFILE_PL)
     eval convert $MODEL $MODEL_ID "$MODEL_RAW_ROOT$MODEL_RAW_DIR/$MODEL_RAW_PL" $TMPFILE_PL
-#    distribute $TMPFILE_PL $OUTFILE_PL
+    if [ -z $DEBUG ]; then
+        distribute $TMPFILE_PL $OUTFILE_PL
+    fi # debug
 fi # pressure
