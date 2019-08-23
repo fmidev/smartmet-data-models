@@ -1,6 +1,6 @@
 MODEL=ecmwf
 MODEL_ID=240
-MODEL_RAW_ROOT='/smartmet/data/incoming/ecmwf/EGA'
+MODEL_RAW_ROOT='/smartmet/data/incoming/ecmwf'
 MODEL_RAW_DIR='/$RT_DATE_HHMMSS'
 MODEL_RAW_SFC='\*.bin'
 MODEL_RAW_PL='\*hPa\*.bin'
