@@ -73,8 +73,8 @@ fi
 
 CONVERT_OPTIONS="$CROP $PROJECTION -C"
 
-if [ -s ./update.sh ]; then
-    ./update.sh
+if [ -s $BASE/run/data/${MODEL}/bin/update.sh ]; then
+    $BASE/run/data/${MODEL}/bin/update.sh
 fi
 
 latest() {
