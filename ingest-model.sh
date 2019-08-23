@@ -92,6 +92,10 @@ latest() {
 # Model Reference Time
 if [ -z "$RT" ]; then
     RT=$(eval latest $MODEL_RAW_ROOT $MODEL_RAW_MASK)
+    if [ -z "$RT" ]; then
+        log "No data available in $MODEL_RAW_ROOT"   
+        exit 1
+    fi
 else
     RT=$(date +%s -d "$RT")
 fi
