@@ -95,7 +95,6 @@ install -m 644 %_topdir/SOURCES/smartmet-data-models/wrf/wrf-pressure.cnf %{buil
 %files
 %defattr(-,smartmet,smartmet,-)
 %{smartmetroot}/bin/*
-%{smartmetroot}/cnf/data
 %{smartmetroot}/tmp/data
 %{smartmetroot}/logs/data
 
