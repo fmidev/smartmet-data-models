@@ -110,7 +110,7 @@ RT_ISO=`date -u -d@$RT +%Y-%m-%dT%H:%M:%SZ`
 OUT=$BASE/data/$MODEL/$AREA
 CNF=$BASE/run/data/$MODEL/cnf
 EDITOR=$BASE/editor/in
-TMP=$BASE/tmp/data/test_${MODEL}_${AREA}_${RT_DATE_HHMM}
+TMP=$BASE/tmp/data/${MODEL}_${AREA}_${RT_DATE_HHMM}
 
 OUTNAME=${RT_DATE_HHMM}_${MODEL}_${AREA}
 OUTFILE_SFC=$OUT/surface/querydata/${OUTNAME}_surface.sqd
