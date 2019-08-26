@@ -76,7 +76,7 @@ else
 fi
 
 
-CONVERT_OPTIONS="$CROP $PROJECTION"
+CONVERT_OPTIONS="$CONVERT_OPTIONS $CROP $PROJECTION"
 
 if [ -s $BASE/run/data/${MODEL}/bin/update.sh ]; then
     $BASE/run/data/${MODEL}/bin/update.sh
@@ -165,7 +165,7 @@ convert() {
     local GRB=$3
     local SQD=$4
 
-    local OPTIONS=""
+    local OPTIONS="$CONVERT_OPTIONS"
     
     if [[ $SQD == *"surface"* ]]; then
         LEVEL=surface

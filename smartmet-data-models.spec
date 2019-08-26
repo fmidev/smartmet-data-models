@@ -1,8 +1,8 @@
 %define smartmetroot /smartmet
 
 Name:           smartmet-data-models
-Version:        19.8.20
-Release:        8%{?dist}.fmi
+Version:        19.8.26
+Release:        1%{?dist}.fmi
 Summary:        SmartMet Data Models Common
 Group:          System Environment/Base
 License:        MIT
