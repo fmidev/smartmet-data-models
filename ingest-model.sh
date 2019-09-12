@@ -24,14 +24,15 @@ if [ $# -eq 0 ]; then
 fi
 
 # Parse options
-while getopts  "a:dm:p:t:" flag
+while getopts  "a:dfm:p:t:" flag
 do
     case "$flag" in
 	a) AREA=$OPTARG;;
 	m) MODEL=$OPTARG;;
-    p) PROJECTION=$OPTARG;;
-    t) RT=$OPTARG;;
-    d) DEBUG=1
+	p) PROJECTION=$OPTARG;;
+	t) RT=$OPTARG;;
+	d) DEBUG=1;;
+	f) FORCE=1;;
     esac
 done
 
@@ -170,6 +171,11 @@ convert() {
     if [[ $SQD == *"surface"* ]]; then
         LEVEL=surface
         LEVEL_ID=1
+
+       	if [ $(grib_get  -p shortName -w  typeOfLevel=heightAboveGround -w shortName=q $GRB | wc -l) -gt 0 ]; then
+            OPTIONS="$OPTIONS -r 12";
+            log "Enabling RH calculations from Q"
+        fi
     elif [[ $SQD == *"pressure"* ]]; then
         LEVEL=pressure
         LEVEL_ID=100
@@ -177,7 +183,7 @@ convert() {
        	if [ $(grib_get  -p shortName -w  typeOfLevel=isobaricInhPa -w shortName=q $GRB | wc -l) -gt 0 ]; then
             OPTIONS="$OPTIONS -r 12";
             log "Enabling RH calculations from Q"
-	    fi
+        fi
     fi
 
     PRODUCER="${MODEL_ID},${MODEL^^} ${LEVEL^}"
@@ -215,20 +221,23 @@ echo "Output surface level file: $(basename $OUTFILE_SFC)"
 echo "Output pressure level file: $(basename $OUTFILE_PL)"
 
 
-if [ -s $OUTFILE_SFC ] && [ $(eval gribstepcount "$MODEL_RAW_ROOT$MODEL_RAW_DIR/$MODEL_RAW_SFC") -eq $(qdstepcount $OUTFILE_SFC) ]; then
-    log "$(basename $OUTFILE_SFC) is complete"
-    SFCDONE=1
-else
-    log "$(basename $OUTFILE_SFC) is incomplete"
-fi
+if [ -z $FORCE ]; then
+    if [ -s $OUTFILE_SFC ] && [ $(eval gribstepcount "$MODEL_RAW_ROOT$MODEL_RAW_DIR/$MODEL_RAW_SFC") -eq $(qdstepcount $OUTFILE_SFC) ]; then
+	log "$(basename $OUTFILE_SFC) is complete"
+	SFCDONE=1
+    else
+	log "$(basename $OUTFILE_SFC) is incomplete"
+    fi
 
-if [ -s $OUTFILE_PL ] && [ $(eval gribstepcount "$MODEL_RAW_ROOT$MODEL_RAW_DIR/$MODEL_RAW_PL") -eq $(qdstepcount $OUTFILE_PL) ]; then
-    log "$(basename $OUTFILE_PL) is complete"
-    PLDONE=1
+    if [ -s $OUTFILE_PL ] && [ $(eval gribstepcount "$MODEL_RAW_ROOT$MODEL_RAW_DIR/$MODEL_RAW_PL") -eq $(qdstepcount $OUTFILE_PL) ]; then
+	log "$(basename $OUTFILE_PL) is complete"
+	PLDONE=1
+    else
+	log "$(basename $OUTFILE_PL) is incomplete"
+    fi
 else
-    log "$(basename $OUTFILE_PL) is incomplete"
+    log "Conversion forced from command line."
 fi
-
 
 #
 # Surface Data
