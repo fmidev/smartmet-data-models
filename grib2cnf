@@ -3,7 +3,7 @@
 
 $result = array();
 
-$id = array("pres"=>1,"msl"=>1,"prmsl"=>1,"z"=>2,"gh"=>2,"t"=>4,"2t"=>4,"tmax"=>5,"tmin"=>6,"papt"=>9,"dpt"=>10,"2d"=>10,"q"=>12,"r"=>13,"2r"=>13,"orog"=>17,"10wdir"=>20,"10si"=>21,"u"=>23,"10u"=>23,"v"=>24,"10v"=>24,"strf"=>29,"vo"=>30,"absv"=>31,"vp"=>39,"pwat"=>47,"cp"=>48,"acpcp"=>48,"tp"=>50,"sde"=>51,"ulwrf"=>52,"uswrf"=>53,"lsp"=>55,"ncpcp"=>55,"cape"=>59,"cin"=>66,"tcc"=>79,"kx"=>80,"w"=>140,"sst"=>162,"swh"=>165,"cprat"=>201,"d"=>244,"sf"=>264,"lcc"=>273,"mcc"=>274,"hcc"=>275,"cwat"=>276,"lsm"=>281,"al"=>284,"st"=>285,"soilw"=>286,"nswrt"=>313,"nlwrt"=>314,"dlwrf"=>315,"dswrf"=>316,"slhf"=>321,"lhtfl"=>321,"sshf"=>322,"shtfl"=>322,"prate"=>353,"hlcy"=>382,"vis"=>407,"gust"=>417,"tozne"=>441,"sp"=>472,"ci"=>532);
+$id = array("pres"=>1,"msl"=>1,"prmsl"=>1,"z"=>2,"gh"=>2,"h"=>3,"t"=>4,"2t"=>4,"tmax"=>5,"tmin"=>6,"papt"=>9,"dpt"=>10,"2d"=>10,"q"=>12,"r"=>13,"2r"=>13,"orog"=>17,"10wdir"=>20,"10si"=>21,"u"=>23,"10u"=>23,"v"=>24,"10v"=>24,"strf"=>29,"vo"=>30,"absv"=>31,"vp"=>39,"pwat"=>47,"cp"=>48,"acpcp"=>48,"tp"=>50,"sde"=>51,"ulwrf"=>52,"uswrf"=>53,"lsp"=>55,"ncpcp"=>55,"cape"=>59,"cin"=>66,"tcc"=>79,"kx"=>80,"w"=>140,"sst"=>162,"swh"=>165,"cprat"=>201,"d"=>244,"sf"=>264,"lcc"=>273,"mcc"=>274,"hcc"=>275,"cwat"=>276,"lsm"=>281,"al"=>284,"st"=>285,"soilw"=>286,"nswrt"=>313,"nlwrt"=>314,"dlwrf"=>315,"dswrf"=>316,"slhf"=>321,"lhtfl"=>321,"sshf"=>322,"shtfl"=>322,"prate"=>353,"hlcy"=>382,"vis"=>407,"gust"=>417,"tozne"=>441,"sp"=>472,"ci"=>532);
 
 $shortNames = array("1008"=>"tp","20002"=>"","6001"=>"tcc","7006"=>"cape","7007"=>"cin");
 
@@ -138,7 +138,7 @@ print<<<EOT
 #
 #
 # ECMWF Parameter Database
-# https://apps.ecmwf.int/codes/grib/param-db
+# https://codes.ecmwf.int/grib/param-db/
 #
 # List of available SmartMetIDs
 # qdinfo -l
