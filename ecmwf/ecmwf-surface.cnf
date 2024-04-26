@@ -1,9 +1,9 @@
 #
-# Grib to QD Conversion Tables for Centre ECMF
+# Grib to QD Conversion Tables for Centre ECMWF
 #
 #
 # ECMWF Parameter Database
-# http://apps.ecmwf.int/codes/grib/param-db
+# https://codes.ecmwf.int/grib/param-db/
 #
 # List of available SmartMetIDs
 # qdinfo -l

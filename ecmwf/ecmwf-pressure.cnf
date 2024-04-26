@@ -3,7 +3,7 @@
 #
 #
 # ECMWF Parameter Database
-# http://apps.ecmwf.int/codes/grib/param-db
+# https://codes.ecmwf.int/grib/param-db/
 #
 # List of available SmartMetIDs
 # qdinfo -l
