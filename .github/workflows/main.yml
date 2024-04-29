@@ -12,7 +12,7 @@ jobs:
         run: |
           sudo apt-get update
           sudo apt-get install -y rpm
-          mkdir -p rpmbuild/SOURCES 
+          mkdir -p rpmbuild/{BUILD,BUILDROOT,RPMS,SOURCES,SPECS,SRPMS}
 
       - name: Checkout code
         uses: actions/checkout@v4
@@ -21,7 +21,7 @@ jobs:
 
       - name: Build RPM package
         run: |
-          rpmbuild -bb rpmbuild/SOURCES/${{ github.event.repository.name }}/*.spec
+          rpmbuild -bb --define "_topdir ${{ github.workspace }}/rpmbuild" rpmbuild/SOURCES/${{ github.event.repository.name }}/*.spec
 
       - name: Find RPM files
         id: findrpm
