@@ -15,15 +15,22 @@ jobs:
         run: |
           sudo apt-get update
           sudo apt-get install -y rpm
+          mkdir -p ~/rpmbuild/SOURCES
+          cp * ~/rpmbuild/SOURCES/
 
       - name: Build RPM package
         run: |
-          rpmbuild -bb *.spec
+          rpmbuild -bb ~/rpmbuild/SOURCES/*.spec
 
       - name: Find RPM files
         id: findrpm
         run: |
-          echo "::set-output name=files::$(find . -type f -name "*.rpm" -o -name "*.src.rpm")"
+          echo "::set-output name=files::$(find ~/rpmbuild/RPMS/ -type f -name "*.rpm")"
+
+      - name: Find SRPM files
+        id: findsrpm
+        run: |
+          echo "::set-output name=files::$(find ~/rpmbuild/SRPMS/ -type f -name "*.src.rpm")"
 
       - name: Create binary release
         uses: actions/upload-release-asset@v1
@@ -31,4 +38,12 @@ jobs:
           upload_url: ${{ github.event.repository.releases_url }}
           asset_path: ${{ steps.findrpm.outputs.files }}
           asset_name: ${{ steps.findrpm.outputs.files }}
+          asset_content_type: application/x-rpm
+
+      - name: Create source release
+        uses: actions/upload-release-asset@v1
+        with:
+          upload_url: ${{ github.event.repository.releases_url }}
+          asset_path: ${{ steps.findsrpm.outputs.files }}
+          asset_name: ${{ steps.findsrpm.outputs.files }}
           asset_content_type: application/x-rpm
