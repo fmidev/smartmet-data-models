@@ -12,27 +12,26 @@ jobs:
         run: |
           sudo apt-get update
           sudo apt-get install -y rpm
-          mkdir -p ${{ github.workspace }}/rpmbuild/SOURCES
+          mkdir -p rpmbuild/SOURCES 
 
       - name: Checkout code
-        uses: actions/checkout@v2
+        uses: actions/checkout@v4
         with:
-            path: ${{ github.workspace }}/rpmbuild/SOURCES/$(basename ${{ github.repository }})
+            path: rpmbuild/SOURCES/${{ github.event.repository.name }}
 
       - name: Build RPM package
         run: |
-          REPO_NAME=$(basename ${{ github.repository }})
-          rpmbuild -bb ${{ github.workspace }}/rpmbuild/SOURCES/$REPO_NAME/*.spec
+          rpmbuild -bb rpmbuild/SOURCES/${{ github.event.repository.name }}/*.spec
 
       - name: Find RPM files
         id: findrpm
         run: |
-          echo "::set-output name=files::$(find ${{ github.workspace }}/rpmbuild/RPMS/ -type f -name "*.rpm")"
+          echo "::set-output name=files::$(find rpmbuild/RPMS/ -type f -name "*.rpm")"
 
       - name: Find SRPM files
         id: findsrpm
         run: |
-          echo "::set-output name=files::$(find ${{ github.workspace }}/rpmbuild/SRPMS/ -type f -name "*.src.rpm")"
+          echo "::set-output name=files::$(find rpmbuild/SRPMS/ -type f -name "*.src.rpm")"
 
       - name: Create binary release
         uses: actions/upload-release-asset@v1
