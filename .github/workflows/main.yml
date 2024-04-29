@@ -8,15 +8,16 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v2
-
       - name: Set up RPM environment
         run: |
           sudo apt-get update
           sudo apt-get install -y rpm
           mkdir -p ~/rpmbuild/SOURCES
-          cp -a * ~/rpmbuild/SOURCES/
+
+      - name: Checkout code
+        uses: actions/checkout@v2
+        with:
+          path: ~/rpmbuild/SOURCES
 
       - name: Build RPM package
         run: |
