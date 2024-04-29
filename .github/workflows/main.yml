@@ -1,20 +1,34 @@
-name: RPM Build
-on: push
+on:
+  push:
+    branches:
+      - main
 
 jobs:
   build:
     runs-on: ubuntu-latest
-    steps:
-    - uses: actions/checkout@v2
 
-    - name: build RPM package
-      id: rpm
-      uses: naveenrajm7/rpmbuild@master
-      with:
-        spec_file: "smartmet-data-models.spec"
-        
-    - name: Upload artifact
-      uses: actions/upload-artifact@v1.0.0
-      with:
-        name: Binary RPM
-        path: ${{ steps.rpm.outputs.rpm_dir_path }}
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Set up RPM environment
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y rpm
+
+      - name: Build RPM package
+        run: |
+          rpmbuild -bb *.spec
+
+      - name: Find RPM files
+        id: findrpm
+        run: |
+          echo "::set-output name=files::$(find . -type f -name "*.rpm" -o -name "*.src.rpm")"
+
+      - name: Create binary release
+        uses: actions/upload-release-asset@v1
+        with:
+          upload_url: ${{ github.event.repository.releases_url }}
+          asset_path: ${{ steps.findrpm.outputs.files }}
+          asset_name: ${{ steps.findrpm.outputs.files }}
+          asset_content_type: application/x-rpm

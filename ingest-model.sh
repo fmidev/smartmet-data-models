@@ -139,20 +139,23 @@ qdstepcount() {
 # Arguments: outputfile with path
 #
 distribute() {
-    local TMPFILE=$1
-    local OUTFILE=$2
+    local -r TMPFILE=$1
+    local -r OUTFILE=$(basename $2)
+    local -r OUTDIR=$(dirname $2)
+    local -r TIMESTAMP=$(date -u +%Y%m%d%H%M)
+    local -r EDITORFILE="$EDITOR/${TIMESTAMP}_${OUTFILE}.bz2"
     
     if [ -s $TMPFILE ]; then
-	    log "Testing: $(basename $OUTFILE)"
+	    log "Testing: $(basename $TMPFILE)"
 	    if qdstat $TMPFILE; then
-            log "Creating directory: $(dirname $OUTFILE)"
-            mkdir -p $(dirname $OUTFILE)
-            log  "Compressing: $(basename $OUTFILE)"
-            lbzip2 -k $TMPFILE
-            log "Moving: $(basename $OUTFILE) to $OUTFILE"
-            mv -f $TMPFILE $OUTFILE
-            log "Moving: $(basename $OUTFILE).bz2 to $EDITOR/"
-            mv -f $TMPFILE.bz2 $EDITOR/
+            log "Creating directory: $OUTDIR"
+            mkdir -p $OUTDIR
+            log  "Compressing: $(basename $TMPFILE)"
+            pbzip2 -k $TMPFILE
+            log "Moving: $TMPFILE to $OUTDIR"
+            mv -f $TMPFILE $OUTDIR
+            log "Moving: ${OUTFILE}.bz2 to $EDITORFILE"
+            mv -f $TMPFILE.bz2 $EDITORFILE
 	    else
             log "File $TMPFILE is not valid qd file."
     	fi
@@ -162,7 +165,6 @@ distribute() {
 convert() {
     local MODEL=$1
     local MODEL_ID=$2
-#    local OPTIONS=$3
     local GRB=$3
     local SQD=$4
 
@@ -171,18 +173,26 @@ convert() {
     if [[ $SQD == *"surface"* ]]; then
         LEVEL=surface
         LEVEL_ID=1
-
-       	if [ $(grib_get  -p shortName -w  typeOfLevel=heightAboveGround -w shortName=q $GRB | wc -l) -gt 0 ]; then
+#       	if [ $(grib_get  -p shortName -w  typeOfLevel=heightAboveGround -w shortName=q $GRB | wc -l) -gt 0 ]; then
+      	if hasParameter "$GRB" heightAboveGround q ; then
             OPTIONS="$OPTIONS -r 12";
-            log "Enabling RH calculations from Q"
+            log "Enabling RH calculations from Q for surface data."
         fi
     elif [[ $SQD == *"pressure"* ]]; then
         LEVEL=pressure
         LEVEL_ID=100
 
-       	if [ $(grib_get  -p shortName -w  typeOfLevel=isobaricInhPa -w shortName=q $GRB | wc -l) -gt 0 ]; then
+       	if hasParameter "$GRB" isobaricInhPa q ; then
             OPTIONS="$OPTIONS -r 12";
-            log "Enabling RH calculations from Q"
+            log "Enabling RH calculations from Q for pressure data."
+        fi
+    elif [[ $SQD == *"hybrid"* ]]; then
+        LEVEL=hybrid
+        LEVEL_ID=109
+
+       	if hasParameter "$GRB" hybrid q; then
+            OPTIONS="$OPTIONS -r 12";
+            log "Enabling RH calculations from Q for hybrid data."
         fi
     fi
 
@@ -190,23 +200,28 @@ convert() {
 
     log "Creating directory: $(dirname $SQD)"
     mkdir -p $(dirname $SQD)
-    log "Converting $LEVEL grib files to $(basename $SQD)"
+    log "Converting ${MODEL^^} $LEVEL ($LEVEL_ID) grib files to $(basename $SQD)"
     gribtoqd -d -t -L $LEVEL_ID \
     -c $CNF/${MODEL}-${LEVEL}.cnf \
     -p "$PRODUCER" \
     $OPTIONS -o $SQD $GRB 
     log "Converted surface grib files to $(basename $SQD)"
     qdinfo -P -T -x -z -r -q $SQD
-#\$PROJECTION $CROP\
+}
 
-    # Post Process
-    if [ -s $SQD ] && [ -s $CNF/${MODEL}-${LEVEL}.st ]; then
-        log "Post processing: $(basename $SQD)"
-	    qdscript -a 355 -i $SQD $CNF/${MODEL}-${LEVEL}.st > ${SQD}.tmp
-	    mv -f  ${SQD}.tmp $SQD
-	    qdinfo -P -q $SQD
+process() {
+    local SQD=$1
+    local LEVEL=$2
+    if [ -s $SQD ] && [ -d $CNF/st.$LEVEL.d ]; then
+        for SCRIPT in $CNF/st.$LEVEL.d/*-*.st; do
+            PAR=$(basename ${SCRIPT%.*}|cut -d- -f2)
+            log "Post processing: $(basename $SQD) parameter $PAR"
+            echo qdscript -a $PAR -i $SQD $SCRIPT
+            qdscript -a $PAR -i $SQD $SCRIPT > ${SQD}.tmp
+            mv -f ${SQD}.tmp $SQD
+        done
+        qdstat $SQD
     fi
-
 }
 
 #
@@ -215,25 +230,30 @@ convert() {
 echo "Model Reference Time: $RT_ISO"
 echo "Projection: $PROJECTION"
 echo "Temporary directory: $TMP"
-eval echo "Input data: $MODEL_RAW_ROOT$MODEL_RAW_DIR/$MODEL_RAW_SFC"
+eval echo "Input surface level file\(s\): $MODEL_RAW_ROOT$MODEL_RAW_DIR/$MODEL_RAW_SFC"
+eval echo "Input pressure level file\(s\): $MODEL_RAW_ROOT$MODEL_RAW_DIR/$MODEL_RAW_PL"
+eval echo "Input hybrid level file\(s\): $MODEL_RAW_ROOT$MODEL_RAW_DIR/$MODEL_RAW_ML"
+echo "Input surface level file: $(eval ls $INFILE_SFC|xargs -n 1 basename|xargs)"
+echo "Input pressure level file: $(ls $INFILE_PL|xargs -n 1 basename|xargs)"
+echo "Input hybrid level file: $(ls $INFILE_ML|xargs -n 1 basename|xargs)"
 echo "Output directory: $OUT"
 echo "Output surface level file: $(basename $OUTFILE_SFC)"
 echo "Output pressure level file: $(basename $OUTFILE_PL)"
-
+echo "Output hybrid level file: $(basename $OUTFILE_ML)"
 
 if [ -z $FORCE ]; then
     if [ -s $OUTFILE_SFC ] && [ $(eval gribstepcount "$MODEL_RAW_ROOT$MODEL_RAW_DIR/$MODEL_RAW_SFC") -eq $(qdstepcount $OUTFILE_SFC) ]; then
-	log "$(basename $OUTFILE_SFC) is complete"
-	SFCDONE=1
+	    log "$(basename $OUTFILE_SFC) is complete"
+	    SFCDONE=1
     else
-	log "$(basename $OUTFILE_SFC) is incomplete"
+	    log "$(basename $OUTFILE_SFC) is incomplete"
     fi
 
     if [ -s $OUTFILE_PL ] && [ $(eval gribstepcount "$MODEL_RAW_ROOT$MODEL_RAW_DIR/$MODEL_RAW_PL") -eq $(qdstepcount $OUTFILE_PL) ]; then
-	log "$(basename $OUTFILE_PL) is complete"
-	PLDONE=1
+	    log "$(basename $OUTFILE_PL) is complete"
+	    PLDONE=1
     else
-	log "$(basename $OUTFILE_PL) is incomplete"
+	    log "$(basename $OUTFILE_PL) is incomplete"
     fi
 else
     log "Conversion forced from command line."
@@ -246,12 +266,13 @@ if [ -z $SFCDONE ]; then
     TMPFILE_SFC=$TMP/$(basename $OUTFILE_SFC)
 
     eval convert $MODEL $MODEL_ID "$MODEL_RAW_ROOT$MODEL_RAW_DIR/$MODEL_RAW_SFC" $TMPFILE_SFC
+    process $TMPFILE_SFC surface
 
     if [ -s $TMPFILE_SFC ]; then
-	log "Creating Wind and Weather objects: $(basename $OUTFILE_SFC)"
-	qdversionchange -a -t 1 -w 1 -i $TMPFILE_SFC 7 > ${TMPFILE_SFC}.tmp
-	mv -f ${TMPFILE_SFC}.tmp $TMPFILE_SFC
-	qdinfo -P -q $TMPFILE_SFC
+        log "Creating Wind and Weather objects: $(basename $OUTFILE_SFC)"
+        qdversionchange -a -t 1 -w 1 -i $TMPFILE_SFC 7 > ${TMPFILE_SFC}.tmp
+        mv -f ${TMPFILE_SFC}.tmp $TMPFILE_SFC
+        qdinfo -P -q $TMPFILE_SFC
     fi
 
     if [ -z $DEBUG ]; then
@@ -265,6 +286,7 @@ fi # surface
 #
 if [ -z $PLDONE ]; then
     TMPFILE_PL=$TMP/$(basename $OUTFILE_PL)
+    eval echo convert $MODEL $MODEL_ID "$MODEL_RAW_ROOT$MODEL_RAW_DIR/$MODEL_RAW_PL" $TMPFILE_PL
     eval convert $MODEL $MODEL_ID "$MODEL_RAW_ROOT$MODEL_RAW_DIR/$MODEL_RAW_PL" $TMPFILE_PL
     if [ -z $DEBUG ]; then
         distribute $TMPFILE_PL $OUTFILE_PL

@@ -1,7 +1,7 @@
 %define smartmetroot /smartmet
 
 Name:           smartmet-data-models
-Version:        19.8.26
+Version:        23.10.19
 Release:        1%{?dist}.fmi
 Summary:        SmartMet Data Models Common
 Group:          System Environment/Base
@@ -14,8 +14,8 @@ BuildArch:	noarch
 %{?el7:Requires: smartmet-qdtools}
 %{?el6:Requires: grib_api}
 %{?el7:Requires: eccodes}
-Requires:	curl
-Requires:	lbzip2
+Requires: curl
+Requires: pbzip2
 Requires: rsync
 
 %description
@@ -68,6 +68,7 @@ install -m 644 %_topdir/SOURCES/smartmet-data-models/ecmwf/ecmwf.cnf %{buildroot
 install -m 644 %_topdir/SOURCES/smartmet-data-models/ecmwf/ecmwf.cron %{buildroot}%{smartmetroot}/cnf/cron/cron.d/
 install -m 755 %_topdir/SOURCES/smartmet-data-models/ecmwf/clean_data_ecmwf %{buildroot}%{smartmetroot}/cnf/cron/cron.hourly/
 install -m 644 %_topdir/SOURCES/smartmet-data-models/ecmwf/ecmwf-{surface,pressure}.{cnf,st} %{buildroot}%{smartmetroot}/run/data/ecmwf/cnf/
+mkdir -p .%{smartmetroot}/run/data/ecmwf/cnf{st.surface.d,st.pressure.d}
 
 mkdir -p .%{smartmetroot}/run/data/gsm/{bin,cnf}
 install -m 644 %_topdir/SOURCES/smartmet-data-models/gsm/gsm.cnf %{buildroot}%{smartmetroot}/cnf/data/
@@ -141,5 +142,7 @@ install -m 644 %_topdir/SOURCES/smartmet-data-models/wrf/wrf-pressure.cnf %{buil
 rm -rf $RPM_BUILD_ROOT
 
 %changelog
+* Thu Oct 19 2023 Mikko Rauhala <mikko.rauhala@fmi.fi> 23.10.19-1%{?dist}.fmi
+- change lbizp2 to pbzip2
 * Tue Aug 20 2019 Mikko Rauhala <mikko.rauhala@fmi.fi> 19.8.20-1%{?dist}.fmi
 - Initial version
