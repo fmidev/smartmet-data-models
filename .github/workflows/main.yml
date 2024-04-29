@@ -21,7 +21,8 @@ jobs:
 
       - name: Build RPM package
         run: |
-          rpmbuild -bb ${{ github.workspace }}/*.spec
+          REPO_NAME=$(basename ${{ github.repository }})
+          rpmbuild -bb ~/rpmbuild/SOURCES/$REPO_NAME/*.spec
 
       - name: Find RPM files
         id: findrpm
