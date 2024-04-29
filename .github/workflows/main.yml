@@ -16,7 +16,7 @@ jobs:
           sudo apt-get update
           sudo apt-get install -y rpm
           mkdir -p ~/rpmbuild/SOURCES
-          cp * ~/rpmbuild/SOURCES/
+          cp -a * ~/rpmbuild/SOURCES/
 
       - name: Build RPM package
         run: |
