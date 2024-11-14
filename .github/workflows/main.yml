@@ -1,50 +1,69 @@
+name: Build RPM Packages
+
 on:
   push:
-    branches:
-      - master
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+  workflow_dispatch:
 
 jobs:
-  build:
+  build-rpms:
+    name: Build RPM on ${{ matrix.os }}
     runs-on: ubuntu-latest
-
+    strategy:
+      matrix:
+        os: ['rocky8', 'rocky9']
+        include:
+          - os: rocky8
+            tag: '8'
+          - os: rocky9
+            tag: '9'
+    
+    container:
+      image: rockylinux:${{ matrix.tag }}
+      
     steps:
-      - name: Set up RPM environment
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y rpm
-          mkdir -p rpmbuild/{BUILD,BUILDROOT,RPMS,SOURCES,SPECS,SRPMS}
-
-      - name: Checkout code
+      - name: Check out repository
         uses: actions/checkout@v4
-        with:
-            path: rpmbuild/SOURCES/${{ github.event.repository.name }}
-
+        
+      - name: Install build dependencies
+        run: |
+          dnf -y install \
+            rpm-build \
+            rpmdevtools \
+            gcc \
+            make \
+            rpm-devel \
+            rpmlint \
+            tree
+            
+      - name: Set up RPM build environment
+        run: |
+          mkdir -p ~/rpmbuild/{BUILD,RPMS,SOURCES,SPECS,SRPMS}
+          cp ./*.spec ~/rpmbuild/SPECS/
+          
+          # Copy source files to SOURCES directory
+          # Assuming your source files are in the root of the repository
+          # Modify this according to your project structure
+          cp -r ./* ~/rpmbuild/SOURCES/
+          
       - name: Build RPM package
         run: |
-          rpmbuild -bb --define "_topdir ${{ github.workspace }}/rpmbuild" rpmbuild/SOURCES/${{ github.event.repository.name }}/*.spec
-
-      - name: Find RPM files
-        id: findrpm
+          cd ~/rpmbuild/SPECS
+          # Replace package.spec with your actual spec file name
+          rpmbuild -ba *.spec
+          
+      - name: List generated RPMs
         run: |
-          echo "::set-output name=files::$(find rpmbuild/RPMS/ -type f -name "*.rpm")"
-
-      - name: Find SRPM files
-        id: findsrpm
-        run: |
-          echo "::set-output name=files::$(find rpmbuild/SRPMS/ -type f -name "*.src.rpm")"
-
-      - name: Create binary release
-        uses: actions/upload-release-asset@v1
+          tree ~/rpmbuild/RPMS/
+          tree ~/rpmbuild/SRPMS/
+          
+      - name: Upload RPM artifacts
+        uses: actions/upload-artifact@v4
         with:
-          upload_url: ${{ github.event.repository.releases_url }}
-          asset_path: ${{ steps.findrpm.outputs.files }}
-          asset_name: ${{ steps.findrpm.outputs.files }}
-          asset_content_type: application/x-rpm
-
-      - name: Create source release
-        uses: actions/upload-release-asset@v1
-        with:
-          upload_url: ${{ github.event.repository.releases_url }}
-          asset_path: ${{ steps.findsrpm.outputs.files }}
-          asset_name: ${{ steps.findsrpm.outputs.files }}
-          asset_content_type: application/x-rpm
+          name: rpms-${{ matrix.os }}
+          path: |
+            ~/rpmbuild/RPMS/
+            ~/rpmbuild/SRPMS/
+          retention-days: 7
