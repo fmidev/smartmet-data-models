@@ -3,6 +3,8 @@ name: Build RPM Packages
 on:
   push:
     branches: [ master ]
+    tags:
+      - 'v*'
   pull_request:
     branches: [ master ]
   workflow_dispatch:
@@ -43,16 +45,11 @@ jobs:
           mkdir -p ~/rpmbuild/{BUILD,RPMS,SOURCES,SPECS,SRPMS}
           mkdir -p ~/rpmbuild/SOURCES/smartmet-data-models
           cp ./*.spec ~/rpmbuild/SPECS/
-          
-          # Copy source files to SOURCES directory
-          # Assuming your source files are in the root of the repository
-          # Modify this according to your project structure
           cp -r ./* ~/rpmbuild/SOURCES/smartmet-data-models
           
       - name: Build RPM package
         run: |
           cd ~/rpmbuild/SPECS
-          # Replace package.spec with your actual spec file name
           rpmbuild -ba *.spec
           
       - name: List generated RPMs
@@ -68,3 +65,21 @@ jobs:
             ~/rpmbuild/RPMS/
             ~/rpmbuild/SRPMS/
           retention-days: 7
+
+  create-release:
+    needs: build-rpms
+    if: startsWith(github.ref, 'refs/tags/v')
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - name: Download all artifacts
+        uses: actions/download-artifact@v4
+        with:
+          path: artifacts
+          
+      - name: Create Release
+        uses: softprops/action-gh-release@v1
+        with:
+          files: artifacts/**/*
+          generate_release_notes: true
