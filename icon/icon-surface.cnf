@@ -1,0 +1,74 @@
+#
+# Grib to QD Conversion Tables for Centre EDZW
+#
+#
+# ECMWF Parameter Database
+# https://apps.ecmwf.int/codes/grib/param-db
+#
+# List of available SmartMetIDs
+# qdinfo -l
+
+# GribID;SmartMetID;Name;Base;Scale;LevelType;LevelValue;InterpolationMethod
+
+# 1: Pressure Reduced To MSL [Pa]
+260074;1;Pressure Reduced To MSL (prmsl);0;0.01;102;0
+
+# 4: 2 Metre Temperature [K]
+167;4;2 Metre Temperature (2t);-273.15;1;105;2
+
+# 5: Maximum Temperature At 2 Metres Since Previous Post-processing [K]
+201;5;Maximum Temperature At 2 Metres Since Previous Post-processing (mx2t);-273.15;1;105;2
+
+# 6: Minimum Temperature At 2 Metres Since Previous Post-processing [K]
+202;6;Minimum Temperature At 2 Metres Since Previous Post-processing (mn2t);-273.15;1;105;2
+
+# 10: 2 Metre Dewpoint Temperature [K]
+168;10;2 Metre Dewpoint Temperature (2d);-273.15;1;105;2
+
+# 13: 2 Metre Relative Humidity [%]
+260242;13;2 Metre Relative Humidity (2r);0;1;105;2
+
+# 23: 10 Metre U Wind Component [m s**-1]
+165;23;10 Metre U Wind Component (10u);0;1;105;10
+
+# 24: 10 Metre V Wind Component [m s**-1]
+166;24;10 Metre V Wind Component (10v);0;1;105;10
+
+# 50: Total Precipitation [kg m**-2]
+228228;50;Total Precipitation (tp);0;1
+
+# 55: Large Scale Rain Rate [kg m**-2 s**-1]
+228219;55;Large Scale Rain Rate (lsrr);0;1
+
+# 59: Convective Available Potential Energy [J kg-1]
+500183;59;Convective Available Potential Energy (CAPE);0;1
+
+# 79: Total Cloud Cover [%]
+500046;79;Total Cloud Cover (tcc);0;1
+
+# 201: Convective Rain Rate [kg m**-2 s**-1]
+228218;201;Convective Rain Rate (crr);0;1
+
+# 270: Height Of 0 Degree Celsius Isotherm Above Msl [m]
+500127;270;Height Of 0 Degree Celsius Isotherm Above Msl (HZEROCL);0;1
+
+# 378: Convective Snowfall Rate Water Equivalent [kg m**-2 s**-1]
+228220;378;Convective Snowfall Rate Water Equivalent (csfr);0;1
+
+# 417: Maximum 10 Metre Wind Gust Since Previous Post-processing [m s**-1]
+49;417;Maximum 10 Metre Wind Gust Since Previous Post-processing (10fg);0;1;105;10
+
+# 472: Surface Pressure [Pa]
+134;472;Surface Pressure (sp);0;0.01
+
+# 316: Downward Diffusive Short Wave Radiation Flux At Surface (mean Over Forecast Time) [W m-2]
+#500481;316;Downward Diffusive Short Wave Radiation Flux At Surface (mean Over Forecast Time) (ASWDIFD_S);0;1
+
+# 10534 : Geopotential (S) [m2 s-2]
+500004;10534;Geopotential (S) (FIS);0;1
+
+# 12996 : Large Scale Snowfall Rate Water Equivalent [kg m**-2 s**-1]
+228221;12996;Large Scale Snowfall Rate Water Equivalent (lssfr);0;1
+
+# : Downward Direct Short Wave Radiation Flux At Surface (mean Over Forecast Time) [W m-2]
+#500480;;Downward Direct Short Wave Radiation Flux At Surface (mean Over Forecast Time) (ASWDIR_S);0;1
