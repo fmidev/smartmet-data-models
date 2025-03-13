@@ -19,6 +19,9 @@
 # 12: Specific Humidity [kg kg**-1]
 133;12;Specific Humidity (q);0;1
 
+# 13: Relative Humidity [%]
+157;13;Relative Humidity (r);0;1
+
 # 23: U Component Of Wind [m s**-1]
 131;23;U Component Of Wind (u);0;1
 
