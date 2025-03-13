@@ -1,0 +1,2 @@
+15 * * * * utcrun 4 /smartmet/bin/ingest-model.sh -m icon
+15 * * * * utcrun 16 /smartmet/bin/ingest-model.sh -m icon
