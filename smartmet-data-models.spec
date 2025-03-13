@@ -133,6 +133,15 @@ install -m 644 %_topdir/SOURCES/smartmet-data-models/wrf/wrf-pressure.cnf %{buil
 %config(noreplace) %{smartmetroot}/run/data/gsm/cnf/gsm-surface.cnf
 %config(noreplace) %{smartmetroot}/run/data/gsm/cnf/gsm-pressure.cnf
 
+# ICON
+%files icon
+%defattr(-,smartmet,smartmet,-)
+%config(noreplace) %{smartmetroot}/cnf/data/icon.cnf
+%config(noreplace) %{smartmetroot}/cnf/cron/cron.d/icon.cron
+%config(noreplace) %attr(0755,smartmet,smartmet) %{smartmetroot}/cnf/cron/cron.hourly/clean_data_icon
+%config(noreplace) %{smartmetroot}/run/data/icon/cnf/icon-surface.cnf
+%config(noreplace) %{smartmetroot}/run/data/icon/cnf/icon-pressure.cnf
+
 # UKMO
 %files ukmo
 %defattr(-,smartmet,smartmet,-)
@@ -156,6 +165,8 @@ install -m 644 %_topdir/SOURCES/smartmet-data-models/wrf/wrf-pressure.cnf %{buil
 rm -rf $RPM_BUILD_ROOT
 
 %changelog
+* Thu Mar 13 2025 Mikko Rauhala <mikko.rauhala@fmi.fi> 25.3.13-1%{?dist}.fmi
+- add ICON model
 * Thu Oct 19 2023 Mikko Rauhala <mikko.rauhala@fmi.fi> 23.10.19-1%{?dist}.fmi
 - change lbizp2 to pbzip2
 * Tue Aug 20 2019 Mikko Rauhala <mikko.rauhala@fmi.fi> 19.8.20-1%{?dist}.fmi
