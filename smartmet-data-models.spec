@@ -1,7 +1,7 @@
 %define smartmetroot /smartmet
 
 Name:           smartmet-data-models
-Version:        24.11.14
+Version:        25.3.13
 Release:        1%{?dist}.fmi
 Summary:        SmartMet Data Models Common
 Group:          System Environment/Base
@@ -34,6 +34,13 @@ Requires: smartmet-data-models
 
 %description gsm
 SmartMet data ingest module for GSM model
+
+%package icon
+Summary: SmartMet Data ICON
+Requires: smartmet-data-models
+
+%description icon
+SmartMet data ingest module for ICON models
 
 %package ukmo
 Summary: SmartMet Data UKMO
@@ -76,6 +83,13 @@ install -m 644 %_topdir/SOURCES/smartmet-data-models/gsm/gsm.cron %{buildroot}%{
 install -m 755 %_topdir/SOURCES/smartmet-data-models/gsm/clean_data_gsm %{buildroot}%{smartmetroot}/cnf/cron/cron.hourly/
 install -m 644 %_topdir/SOURCES/smartmet-data-models/gsm/gsm-surface.cnf %{buildroot}%{smartmetroot}/run/data/gsm/cnf/
 install -m 644 %_topdir/SOURCES/smartmet-data-models/gsm/gsm-pressure.cnf %{buildroot}%{smartmetroot}/run/data/gsm/cnf/
+
+mkdir -p .%{smartmetroot}/run/data/icon/{bin,cnf}
+install -m 644 %_topdir/SOURCES/smartmet-data-models/icon/icon.cnf %{buildroot}%{smartmetroot}/cnf/data/
+install -m 644 %_topdir/SOURCES/smartmet-data-models/icon/icon.cron %{buildroot}%{smartmetroot}/cnf/cron/cron.d/
+install -m 755 %_topdir/SOURCES/smartmet-data-models/icon/clean_data_icon %{buildroot}%{smartmetroot}/cnf/cron/cron.hourly/
+install -m 644 %_topdir/SOURCES/smartmet-data-models/icon/icon-surface.cnf %{buildroot}%{smartmetroot}/run/data/icon/cnf/
+install -m 644 %_topdir/SOURCES/smartmet-data-models/icon/icon-pressure.cnf %{buildroot}%{smartmetroot}/run/data/icon/cnf/
 
 mkdir -p .%{smartmetroot}/run/data/ukmo/{bin,cnf}
 install -m 644 %_topdir/SOURCES/smartmet-data-models/ukmo/ukmo.cnf %{buildroot}%{smartmetroot}/cnf/data/
