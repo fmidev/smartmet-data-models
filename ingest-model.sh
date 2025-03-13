@@ -1,7 +1,5 @@
-#!/bin/sh 
-#
-# Finnish Meteorological Institute / Mikko Rauhala (2019)
-#
+#!/bin/sh
+# Finnish Meteorological Institute / Mikko Rauhala (2019-2023)
 # SmartMet Data Ingestion Module
 #
 # Usage: ./ingest-model.sh -m modelname
@@ -19,18 +17,25 @@ else
 fi
 
 if [ $# -eq 0 ]; then
-    echo "OPTIONS\n  -m arg\tmodel\n  -a arg\tarea\n  -t arg\treference time (yyyymmddThh)"
+    echo "OPTIONS"
+    printf "\t%s\t%s\n" "-m model" ""
+    printf "\t%s\t%s\n" "-a area" ""
+    printf "\t%s\t%s\n" "-t yyyymmddThh" "reference time"
+    printf "\t%s\t%s\n" "-i input" "input grib file (over rides reference time)"
+    printf "\t%s\t\t%s\n" "-d" "debug, do not distribute"
+    printf "\t%s\t\t%s\n" "-f" "force"
     exit 1
 fi
 
 # Parse options
-while getopts  "a:dfm:p:t:" flag
+while getopts  "a:dfi:m:p:t:" flag
 do
     case "$flag" in
 	a) AREA=$OPTARG;;
 	m) MODEL=$OPTARG;;
 	p) PROJECTION=$OPTARG;;
-	t) RT=$OPTARG;;
+	t) RT=$(date +%s -d "$OPTARG");;
+    i) IN=$OPTARG;;
 	d) DEBUG=1;;
 	f) FORCE=1;;
     esac
@@ -53,7 +58,7 @@ if [ -s $BASE/cnf/data/${MODEL}-${AREA}.cnf ]; then
 elif [ -s $BASE/cnf/data/${MODEL}.cnf ]; then
     . $BASE/cnf/data/${MODEL}.cnf
 else
-    log "Neither ${MODEL}-${AREA}.cnf nor ${MODEL}.cnf found in directory $BASE/cnf/data/"   
+    log "Neither ${MODEL}-${AREA}.cnf nor ${MODEL}.cnf found in directory $BASE/cnf/data/"
     exit 1
 fi
 
@@ -64,22 +69,10 @@ if [ $TERM = "dumb" ]; then
     exec &> $LOGFILE
 fi
 
-if [ -z "$PROJECTION" ]; then
-    PROJECTION=""
-else
-    PROJECTION="-P $PROJECTION"
-fi
-
-if [ -z "$CROP" ]; then
-    CROP=""
-else
-    CROP="-G $CROP"
-fi
-
-
-CONVERT_OPTIONS="$CONVERT_OPTIONS $CROP $PROJECTION"
+CONVERT_OPTIONS="$CONVERT_OPTIONS ${CROP:+"-G $CROP"} ${PROJECTION:+"-P $PROJECTION"}"
 
 if [ -s $BASE/run/data/${MODEL}/bin/update.sh ]; then
+    echo "Running $BASE/run/data/${MODEL}/bin/update.sh"
     $BASE/run/data/${MODEL}/bin/update.sh
 fi
 
@@ -90,16 +83,27 @@ latest() {
     date -u +%s -d "$(grib_get -F %04d -p dataDate:i,dataTime:i $DIR/$FILE | sort -nu | tail -1 )"
 }
 
+if [ -z "$IN" ]; then
+    INFILE_SFC="$MODEL_RAW_ROOT$MODEL_RAW_DIR/${MODEL_RAW_SFC}"
+    INFILE_PL="$MODEL_RAW_ROOT$MODEL_RAW_DIR/${MODEL_RAW_PL}"
+    INFILE_ML="$MODEL_RAW_ROOT$MODEL_RAW_DIR/${MODEL_RAW_ML}"
+else
+    INFILE_SFC="$IN"
+    INFILE_PL="$IN"
+    INFILE_ML="$IN"
+    RT=$(date -u +%s -d "$(grib_get -F %04d -p dataDate:i,dataTime:i $IN | sort -nu | tail -1 )")
+    echo "foo: $RT"
+fi
+
 # Model Reference Time
 if [ -z "$RT" ]; then
     RT=$(eval latest $MODEL_RAW_ROOT $MODEL_RAW_MASK)
     if [ -z "$RT" ]; then
-        log "No data available in $MODEL_RAW_ROOT"   
+        log "No data available in $MODEL_RAW_ROOT"
         exit 1
     fi
-else
-    RT=$(date +%s -d "$RT")
 fi
+
 RT_HOUR=`date -u -d@$RT +%H`
 RT_DATE_MMDD=`date -u -d@$RT +%Y%m%d`
 RT_DATE_MMDDHH=`date -u -d@$RT +%m%d%H`
@@ -111,7 +115,6 @@ RT_YYMMDD_HHMM=`date -u -d@$RT +%y%m%d%H%M`
 RT_DATE_HHMMSS=`date -u -d@$RT +%Y%m%d%H%M%S`
 RT_ISO=`date -u -d@$RT +%Y-%m-%dT%H:%M:%SZ`
 
-
 OUT=$BASE/data/$MODEL/$AREA
 CNF=$BASE/run/data/$MODEL/cnf
 EDITOR=$BASE/editor/in
@@ -121,6 +124,7 @@ OUTNAME=${RT_DATE_HHMM}_${MODEL}_${AREA}
 OUTFILE_SFC=$OUT/surface/querydata/${OUTNAME}_surface.sqd
 OUTFILE_PL=$OUT/pressure/querydata/${OUTNAME}_pressure.sqd
 OUTFILE_ML=$OUT/hybrid/querydata/${OUTNAME}_hybrid.sqd
+
 
 gribstepcount() {
     local FILES=$1
@@ -132,6 +136,16 @@ qdstepcount() {
     qdinfo -t -q $FILE | grep Timesteps | cut -d= -f2| tr -d ' '
 }
 
+hasParameter() {
+    local -r FILE=$1
+    local -r LEVEL=$2
+    local -r NAME=$3
+
+    if [ $(grib_get -p shortName -w typeOfLevel=$LEVEL,shortName=$NAME $FILE | wc -l) -gt 0 ]; then
+        return
+    fi
+    false
+}
 
 #
 # Distribute files if valid
@@ -144,7 +158,7 @@ distribute() {
     local -r OUTDIR=$(dirname $2)
     local -r TIMESTAMP=$(date -u +%Y%m%d%H%M)
     local -r EDITORFILE="$EDITOR/${TIMESTAMP}_${OUTFILE}.bz2"
-    
+
     if [ -s $TMPFILE ]; then
 	    log "Testing: $(basename $TMPFILE)"
 	    if qdstat $TMPFILE; then
@@ -169,7 +183,7 @@ convert() {
     local SQD=$4
 
     local OPTIONS="$CONVERT_OPTIONS"
-    
+
     if [[ $SQD == *"surface"* ]]; then
         LEVEL=surface
         LEVEL_ID=1
@@ -204,7 +218,7 @@ convert() {
     gribtoqd -d -t -L $LEVEL_ID \
     -c $CNF/${MODEL}-${LEVEL}.cnf \
     -p "$PRODUCER" \
-    $OPTIONS -o $SQD $GRB 
+    $OPTIONS -o $SQD $GRB
     log "Converted surface grib files to $(basename $SQD)"
     qdinfo -P -T -x -z -r -q $SQD
 }
@@ -226,7 +240,7 @@ process() {
 
 #
 # Print Information
-# 
+#
 echo "Model Reference Time: $RT_ISO"
 echo "Projection: $PROJECTION"
 echo "Temporary directory: $TMP"
