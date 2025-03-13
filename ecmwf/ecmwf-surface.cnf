@@ -13,6 +13,9 @@
 # 1: Mean Sea Level Pressure [Pa]
 151;1;Mean Sea Level Pressure (msl);0;0.01
 
+# 2: Geopotential Height [gpm]
+156;2;Geopotential Height (gh);0;1
+
 # 4: 2 Metre Temperature [K]
 167;4;2 Metre Temperature (2t);-273.15;1
 
@@ -21,6 +24,9 @@
 
 # 12: Specific Humidity [kg kg**-1]
 133;12;Specific Humidity (q);0;1
+
+# 13: Relative Humidity [%]
+157;13;Relative Humidity (r);0;1
 
 # 23: 10 Metre U Wind Component [m s**-1]
 165;23;10 Metre U Wind Component (10u);0;1
@@ -34,17 +40,38 @@
 # 24: V Component Of Wind [m s**-1]
 132;24;V Component Of Wind (v);0;1
 
+# 48: Convective Precipitation [m]
+143;48;Convective Precipitation (cp);0;1000
+
 # 50: Total Precipitation [m]
 228;50;Total Precipitation (tp);0;1000
+
+# 51: Snow Depth [m of water equivalent]
+141;51;Snow Depth (sd);0;1000
+
+# 55: Large-scale Precipitation [m]
+142;55;Large-scale Precipitation (lsp);0;1000
+
+# 59: Convective Available Potential Energy [J kg**-1]
+59;59;Convective Available Potential Energy (cape);0;1
 
 # 79: Total Cloud Cover [(0 - 1)]
 164;79;Total Cloud Cover (tcc);0;100
 
+# 80: K Index [K]
+260121;80;K Index (kx);-273.15;1
+
 # 140: Vertical Velocity [Pa s**-1]
 135;140;Vertical Velocity (w);0;100
 
+# 264: Snowfall [m of water equivalent]
+144;264;Snowfall (sf);0;1000
+
 # 162: Sea Surface Temperature [K]
 34;162;Sea Surface Temperature (sst);-273.15;1
+
+# 263: Instantaneous Total Lightning Flash Density [km**-2 day**-1]
+228050;263;Instantaneous Total Lightning Flash Density (litoti);0;1;entireAtmosphere;0
 
 # 273: Low Cloud Cover [(0 - 1)]
 186;273;Low Cloud Cover (lcc);0;100
@@ -55,5 +82,29 @@
 # 275: High Cloud Cover [(0 - 1)]
 188;275;High Cloud Cover (hcc);0;100
 
+# 311: Surface Net Short-wave (solar) Radiation [J m**-2]
+176;311;Surface Net Short-wave (solar) Radiation (ssr);0;1
+
+# 312: Surface Net Long-wave (thermal) Radiation [J m**-2]
+177;312;Surface Net Long-wave (thermal) Radiation (str);0;1
+
+# 314: Top Net Long-wave (thermal) Radiation [J m**-2]
+179;314;Top Net Long-wave (thermal) Radiation (ttr);0;1
+
+# 407: Visibility [m]
+3020;407;Visibility (vis);0;1
+
 # 472: Surface Pressure [Pa]
 134;472;Surface Pressure (sp);0;0.01
+
+# 500: Cloud Base Height [m]
+228023;500;Cloud Base Height (cbh);0;1
+
+# 915: Height Of Convective Cloud Top [m]
+228046;915;Height Of Convective Cloud Top (hcct);0;1
+
+# 1205: Precipitation Type [code table (4.201)]
+260015;1205;Precipitation Type (ptype);0;1
+
+# 1210: Total Column Water [kg m**-2]
+136;1210;Total Column Water (tcw);0;1
