@@ -1,0 +1,10 @@
+MODEL=icon
+MODEL_ID=170
+MODEL_RAW_ROOT='/smartmet/data/incoming/icon'
+MODEL_RAW_DIR='/$RT_HOUR'
+MODEL_RAW_SFC='\*icon-eu_europe_regular-lat-lon\*.grib2'
+MODEL_RAW_PL='ICON\*.grb'
+
+MODEL_RAW_MASK='ICON\*'
+
+AREA=europe
