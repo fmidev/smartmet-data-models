@@ -6,7 +6,26 @@
 #
 
 log() {
-    echo "$(date -u +%H:%M:%S) $1"
+    local level=$1
+    local message=$2
+    local timestamp=$(date -u +%H:%M:%S)
+    
+    case $level in
+        INFO)
+            printf '\033[0;32m[%s] INFO: %s\033[0m\n' "$timestamp" "$message"
+            ;;
+        ERROR)
+            printf '\033[0;31m[%s] ERROR: %s\033[0m\n' "$timestamp" "$message"
+            ;;
+        *)
+            printf '[%s] %s\n' "$timestamp" "$message"
+            ;;
+    esac
+}
+
+
+logold() {
+    printf '[%s] %s\n' "$(date -u +%H:%M:%S)" "$1"
 }
 
 # Set base directory
@@ -58,7 +77,7 @@ if [ -s $BASE/cnf/data/${MODEL}-${AREA}.cnf ]; then
 elif [ -s $BASE/cnf/data/${MODEL}.cnf ]; then
     . $BASE/cnf/data/${MODEL}.cnf
 else
-    log "Neither ${MODEL}-${AREA}.cnf nor ${MODEL}.cnf found in directory $BASE/cnf/data/"
+    log ERROR "Neither ${MODEL}-${AREA}.cnf nor ${MODEL}.cnf found in directory $BASE/cnf/data/"
     exit 1
 fi
 
@@ -72,7 +91,7 @@ fi
 CONVERT_OPTIONS="$CONVERT_OPTIONS ${CROP:+"-G $CROP"} ${PROJECTION:+"-P $PROJECTION"}"
 
 if [ -s $BASE/run/data/${MODEL}/bin/update.sh ]; then
-    echo "Running $BASE/run/data/${MODEL}/bin/update.sh"
+    log INFO "Running $BASE/run/data/${MODEL}/bin/update.sh"
     $BASE/run/data/${MODEL}/bin/update.sh
 fi
 
@@ -83,23 +102,13 @@ latest() {
     date -u +%s -d "$(grib_get -F %04d -p dataDate:i,dataTime:i $DIR/$FILE | sort -nu | tail -1 )"
 }
 
-if [ -z "$IN" ]; then
-    INFILE_SFC="$MODEL_RAW_ROOT$MODEL_RAW_DIR/${MODEL_RAW_SFC}"
-    INFILE_PL="$MODEL_RAW_ROOT$MODEL_RAW_DIR/${MODEL_RAW_PL}"
-    INFILE_ML="$MODEL_RAW_ROOT$MODEL_RAW_DIR/${MODEL_RAW_ML}"
-else
-    INFILE_SFC="$IN"
-    INFILE_PL="$IN"
-    INFILE_ML="$IN"
-    RT=$(date -u +%s -d "$(grib_get -F %04d -p dataDate:i,dataTime:i $IN | sort -nu | tail -1 )")
-    echo "foo: $RT"
-fi
+
 
 # Model Reference Time
 if [ -z "$RT" ]; then
     RT=$(eval latest $MODEL_RAW_ROOT $MODEL_RAW_MASK)
     if [ -z "$RT" ]; then
-        log "No data available in $MODEL_RAW_ROOT"
+        log ERROR "No data available in $MODEL_RAW_ROOT"
         exit 1
     fi
 fi
@@ -119,6 +128,18 @@ OUT=$BASE/data/$MODEL/$AREA
 CNF=$BASE/run/data/$MODEL/cnf
 EDITOR=$BASE/editor/in
 TMP=$BASE/tmp/data/${MODEL}_${AREA}_${RT_DATE_HHMM}
+
+if [ -z "$IN" ]; then
+    eval INFILE_SFC="$MODEL_RAW_ROOT$MODEL_RAW_DIR/$MODEL_RAW_SFC"
+    eval INFILE_PL="$MODEL_RAW_ROOT$MODEL_RAW_DIR/$MODEL_RAW_PL"
+    eval INFILE_ML="$MODEL_RAW_ROOT$MODEL_RAW_DIR/$MODEL_RAW_ML"
+else
+    INFILE_SFC="$IN"
+    INFILE_PL="$IN"
+    INFILE_ML="$IN"
+    RT=$(date -u +%s -d "$(grib_get -F %04d -p dataDate:i,dataTime:i $IN | sort -nu | tail -1 )")
+    echo "foo: $RT"
+fi
 
 OUTNAME=${RT_DATE_HHMM}_${MODEL}_${AREA}
 OUTFILE_SFC=$OUT/surface/querydata/${OUTNAME}_surface.sqd
@@ -160,18 +181,18 @@ distribute() {
     local -r EDITORFILE="$EDITOR/${TIMESTAMP}_${OUTFILE}.bz2"
 
     if [ -s $TMPFILE ]; then
-	    log "Testing: $(basename $TMPFILE)"
+	    log INFO "Testing: $(basename $TMPFILE)"
 	    if qdstat $TMPFILE; then
-            log "Creating directory: $OUTDIR"
+            log INFO "Creating directory: $OUTDIR"
             mkdir -p $OUTDIR
-            log  "Compressing: $(basename $TMPFILE)"
+            log  INFO "Compressing: $(basename $TMPFILE)"
             pbzip2 -k $TMPFILE
-            log "Moving: $TMPFILE to $OUTDIR"
+            log INFO "Moving: $TMPFILE to $OUTDIR"
             mv -f $TMPFILE $OUTDIR
-            log "Moving: ${OUTFILE}.bz2 to $EDITORFILE"
+            log INFO "Moving: ${OUTFILE}.bz2 to $EDITORFILE"
             mv -f $TMPFILE.bz2 $EDITORFILE
 	    else
-            log "File $TMPFILE is not valid qd file."
+            log ERROR "File $TMPFILE is not valid qd file."
     	fi
     fi
 }
@@ -190,7 +211,7 @@ convert() {
 #       	if [ $(grib_get  -p shortName -w  typeOfLevel=heightAboveGround -w shortName=q $GRB | wc -l) -gt 0 ]; then
       	if hasParameter "$GRB" heightAboveGround q ; then
             OPTIONS="$OPTIONS -r 12";
-            log "Enabling RH calculations from Q for surface data."
+            log INFO "Enabling RH calculations from Q for surface data."
         fi
     elif [[ $SQD == *"pressure"* ]]; then
         LEVEL=pressure
@@ -198,7 +219,7 @@ convert() {
 
        	if hasParameter "$GRB" isobaricInhPa q ; then
             OPTIONS="$OPTIONS -r 12";
-            log "Enabling RH calculations from Q for pressure data."
+            log INFO "Enabling RH calculations from Q for pressure data."
         fi
     elif [[ $SQD == *"hybrid"* ]]; then
         LEVEL=hybrid
@@ -206,71 +227,92 @@ convert() {
 
        	if hasParameter "$GRB" hybrid q; then
             OPTIONS="$OPTIONS -r 12";
-            log "Enabling RH calculations from Q for hybrid data."
+            log INFO "Enabling RH calculations from Q for hybrid data."
         fi
     fi
 
     PRODUCER="${MODEL_ID},${MODEL^^} ${LEVEL^}"
+    CNF_FILE="$CNF/${MODEL}-${LEVEL}.cnf"
 
-    log "Creating directory: $(dirname $SQD)"
+    # Check if config file exists 
+    if [ ! -s "$CNF_FILE" ]; then
+        log ERROR "Config file '$CNF_FILE' does not exist or is empty"
+        return 1
+    fi
+
+    log INFO "Creating directory: $(dirname $SQD)"
     mkdir -p $(dirname $SQD)
-    log "Converting ${MODEL^^} $LEVEL ($LEVEL_ID) grib files to $(basename $SQD)"
+    log INFO "Converting ${MODEL^^} $LEVEL ($LEVEL_ID) grib files to $(basename $SQD)"
     gribtoqd -d -t -L $LEVEL_ID \
-    -c $CNF/${MODEL}-${LEVEL}.cnf \
+    -c $CNF_FILE \
     -p "$PRODUCER" \
     $OPTIONS -o $SQD $GRB
-    log "Converted surface grib files to $(basename $SQD)"
+    log INFO "Converted surface grib files to $(basename $SQD)"
     qdinfo -P -T -x -z -r -q $SQD
 }
 
 process() {
-    local SQD=$1
-    local LEVEL=$2
+    local SQD="$1"
+    local LEVEL="$2"
+
+    # Check if input file exists and script directory exists
+    if [ ! -s "$SQD" ]; then
+        log ERROR "Input file '$SQD' does not exist or is empty"
+        return 2
+    fi
+
     if [ -s $SQD ] && [ -d $CNF/st.$LEVEL.d ]; then
         for SCRIPT in $CNF/st.$LEVEL.d/*-*.st; do
             PAR=$(basename ${SCRIPT%.*}|cut -d- -f2)
-            log "Post processing: $(basename $SQD) parameter $PAR"
-            echo qdscript -a $PAR -i $SQD $SCRIPT
-            qdscript -a $PAR -i $SQD $SCRIPT > ${SQD}.tmp
-            mv -f ${SQD}.tmp $SQD
+            log INFO "Post process: $(basename $SQD) parameter $PAR"
+            log INFO "Run: qdscript -a $PAR -i $SQD -o ${SQD}.tmp $SCRIPT"
+            qdscript -a $PAR -i $SQD -o ${SQD}.tmp $SCRIPT
+            mv -f "${SQD}.tmp" "$SQD"
         done
-        qdstat $SQD
+        log INFO "Testing processed output: $SQD"
+        qdstat "$SQD"
     fi
 }
 
 #
 # Print Information
 #
-echo "Model Reference Time: $RT_ISO"
-echo "Projection: $PROJECTION"
-echo "Temporary directory: $TMP"
-eval echo "Input surface level file\(s\): $MODEL_RAW_ROOT$MODEL_RAW_DIR/$MODEL_RAW_SFC"
-eval echo "Input pressure level file\(s\): $MODEL_RAW_ROOT$MODEL_RAW_DIR/$MODEL_RAW_PL"
-eval echo "Input hybrid level file\(s\): $MODEL_RAW_ROOT$MODEL_RAW_DIR/$MODEL_RAW_ML"
-echo "Input surface level file: $(eval ls $INFILE_SFC|xargs -n 1 basename|xargs)"
-echo "Input pressure level file: $(ls $INFILE_PL|xargs -n 1 basename|xargs)"
-echo "Input hybrid level file: $(ls $INFILE_ML|xargs -n 1 basename|xargs)"
-echo "Output directory: $OUT"
-echo "Output surface level file: $(basename $OUTFILE_SFC)"
-echo "Output pressure level file: $(basename $OUTFILE_PL)"
-echo "Output hybrid level file: $(basename $OUTFILE_ML)"
+log INFO "Model: $MODEL"
+log INFO "Area: $AREA"
+log INFO "Reference Time: $RT_ISO"
+log INFO "Projection: $PROJECTION"
+log INFO "Temporary directory: $TMP"
+echo ""
+
+log INFO "INPUT"
+log INFO "Input surface level file(s): $INFILE_SFC"
+log INFO "Input pressure level file(s): $INFILE_PL"
+log INFO "Input hybrid level file(s): $INFILE_ML"
+echo ""
+
+log INFO "OUTPUT"
+log INFO "Output directory: $OUT"
+log INFO "Output surface level file: $(basename $OUTFILE_SFC)"
+log INFO "Output pressure level file: $(basename $OUTFILE_PL)"
+log INFO "Output hybrid level file: $(basename $OUTFILE_ML)"
+echo ""
 
 if [ -z $FORCE ]; then
-    if [ -s $OUTFILE_SFC ] && [ $(eval gribstepcount "$MODEL_RAW_ROOT$MODEL_RAW_DIR/$MODEL_RAW_SFC") -eq $(qdstepcount $OUTFILE_SFC) ]; then
-	    log "$(basename $OUTFILE_SFC) is complete"
+    if [ -s "$OUTFILE_SFC" ] && [ $(gribstepcount "$INFILE_SFC") -eq $(qdstepcount "$OUTFILE_SFC") ]; then
+	    log INFO "$(basename "$OUTFILE_SFC") is complete"
 	    SFCDONE=1
     else
-	    log "$(basename $OUTFILE_SFC) is incomplete"
+	    log INFO "$(basename $OUTFILE_SFC) is incomplete"
     fi
 
-    if [ -s $OUTFILE_PL ] && [ $(eval gribstepcount "$MODEL_RAW_ROOT$MODEL_RAW_DIR/$MODEL_RAW_PL") -eq $(qdstepcount $OUTFILE_PL) ]; then
-	    log "$(basename $OUTFILE_PL) is complete"
+    if [ -s "$OUTFILE_PL" ] && [ $(eval gribstepcount "$INFILE_PL") -eq $(qdstepcount "$OUTFILE_PL") ]; then
+	    log INFO "$(basename "$OUTFILE_PL") is complete"
 	    PLDONE=1
     else
-	    log "$(basename $OUTFILE_PL) is incomplete"
+	    log INFO "$(basename "$OUTFILE_PL") is incomplete"
     fi
 else
-    log "Conversion forced from command line."
+    log INFO "Conversion forced from command line."
 fi
 
 #
@@ -283,7 +325,7 @@ if [ -z $SFCDONE ]; then
     process $TMPFILE_SFC surface
 
     if [ -s $TMPFILE_SFC ]; then
-        log "Creating Wind and Weather objects: $(basename $OUTFILE_SFC)"
+        log INFO "Creating Wind and Weather objects: $(basename $OUTFILE_SFC)"
         qdversionchange -a -t 1 -w 1 -i $TMPFILE_SFC 7 > ${TMPFILE_SFC}.tmp
         mv -f ${TMPFILE_SFC}.tmp $TMPFILE_SFC
         qdinfo -P -q $TMPFILE_SFC
