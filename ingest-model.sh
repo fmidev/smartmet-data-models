@@ -128,6 +128,7 @@ OUT=$BASE/data/$MODEL/$AREA
 CNF=$BASE/run/data/$MODEL/cnf
 EDITOR=$BASE/editor/in
 TMP=$BASE/tmp/data/${MODEL}_${AREA}_${RT_DATE_HHMM}
+mkdir -p $TMP
 
 if [ -z "$IN" ]; then
     eval INFILE_SFC="$MODEL_RAW_ROOT$MODEL_RAW_DIR/$MODEL_RAW_SFC"
@@ -352,6 +353,5 @@ fi # pressure
 #
 # Clean
 #
-if [ -d $TMP ]; then
-    rmdir $TMP
-fi
+trap 'rm -rf "$TMP"; log INFO "Cleanup complete"' EXIT
+
