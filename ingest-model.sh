@@ -265,9 +265,10 @@ process() {
     if [ -s $SQD ] && [ -d $CNF/st.$LEVEL.d ]; then
         for SCRIPT in $CNF/st.$LEVEL.d/*-*.st; do
             PAR=$(basename ${SCRIPT%.*}|cut -d- -f2)
+            PARNAME=$(basename ${SCRIPT%.*}|cut -d- -f1)
             log INFO "Post process: $(basename $SQD) parameter $PAR"
-            log INFO "Run: qdscript -a $PAR -i $SQD -o ${SQD}.tmp $SCRIPT"
-            qdscript -a $PAR -i $SQD -o ${SQD}.tmp $SCRIPT
+            log INFO "Run: qdscript -A $PAR,$PARNAME -i $SQD $SCRIPT"
+            qdscript -A $PAR,$PARNAME -i $SQD $SCRIPT > ${SQD}.tmp
             mv -f "${SQD}.tmp" "$SQD"
         done
         log INFO "Testing processed output: $SQD"
