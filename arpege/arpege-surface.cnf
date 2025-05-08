@@ -1,0 +1,192 @@
+#
+# Grib to QD Conversion Tables for Centre LFPW
+#
+#
+# ECMWF Parameter Database
+# https://codes.ecmwf.int/grib/param-db/
+#
+# List of available SmartMetIDs
+# qdinfo -l
+
+# GribID;SmartMetID;Name;Base;Scale;LevelType;LevelValue;InterpolationMethod
+
+# 1: Pressure Reduced To MSL [Pa]
+260074;1;Pressure Reduced To MSL (prmsl);0;0.01;102;0
+
+# 4: 2 Metre Temperature [K]
+167;4;2 Metre Temperature (2t);-273.15;1;105;2
+
+# 13: 2 Metre Relative Humidity [%]
+260242;13;2 Metre Relative Humidity (2r);0;1;105;2
+
+# 20: 10 Metre Wind Direction [Degree true]
+260260;20;10 Metre Wind Direction (10wdir);0;1;105;10
+
+# 21: 10 Metre Wind Speed [m s**-1]
+207;21;10 Metre Wind Speed (10si);0;1;105;10
+
+# 23: 10 Metre U Wind Component [m s**-1]
+165;23;10 Metre U Wind Component (10u);0;1;105;10
+
+# 24: 10 Metre V Wind Component [m s**-1]
+166;24;10 Metre V Wind Component (10v);0;1;105;10
+
+# 50: Total Precipitation [kg m**-2]
+228228;50;Total Precipitation (tp);0;1
+
+# 79: Total Cloud Cover [unknown]
+000;79;Total Cloud Cover (tcc);0;1
+
+# : 10 Metre Eastward Wind Gust Since Previous Post-processing [m s**-1]
+#260646;;10 Metre Eastward Wind Gust Since Previous Post-processing (10efg);0;1;105;10
+
+# : 10 Metre Northward Wind Gust Since Previous Post-processing [m s**-1]
+#260647;;10 Metre Northward Wind Gust Since Previous Post-processing (10nfg);0;1;105;10
+
+# : Maximum 10 Metre Wind Gust Since Previous Post-processing [m s**-1]
+#49;;Maximum 10 Metre Wind Gust Since Previous Post-processing (10fg);0;1;105;10
+
+# : Surface Short-wave (solar) Radiation Downwards [J m**-2]
+#169;;Surface Short-wave (solar) Radiation Downwards (ssrd);0;1
+
+# : Total Snow Precipitation [kg m**-2]
+260046;858;Total Snow Precipitation (tsnowp);0;1
+
+# 3: Geometrical Height [m]
+3008;3;Geometrical Height (h);0;1
+
+# 4: Temperature 0m [K]
+130;288;Temperature 0m (t);-273.15;1;1;0
+
+# 10: 2 Metre Dewpoint Temperature [K]
+168;10;2 Metre Dewpoint Temperature (2d);-273.15;1;105;2
+
+# 273: Low Cloud Cover [%]
+3073;273;Low Cloud Cover (lcc);0;1
+
+# 274: Medium Cloud Cover [%]
+3074;274;Medium Cloud Cover (mcc);0;1
+
+# 275: High Cloud Cover [%]
+3075;275;High Cloud Cover (hcc);0;1
+
+# 321: Surface Latent Heat Flux [J m**-2]
+147;321;Surface Latent Heat Flux (slhf);0;1
+
+# 322: Surface Sensible Heat Flux [J m**-2]
+146;322;Surface Sensible Heat Flux (sshf);0;1
+
+# 472: Surface Pressure [Pa]
+134;472;Surface Pressure (sp);0;0.01
+
+# : 2 Metre Specific Humidity [kg kg**-1]
+#174096;;2 Metre Specific Humidity (2sh);0;1;105;2
+
+# : Boundary Layer Height [m]
+#159;;Boundary Layer Height (blh);0;1
+
+# : Convective Available Potential Energy Instantaneous [m**2 s**-2]
+850011605;59;Convective Available Potential Energy Instantaneous (CAPE_INS);0;1
+
+# : Evaporation [unknown]
+#000;;Evaporation ();0;1
+
+# : Instantaneous Eastward Turbulent Surface Stress [N m**-2]
+#229;;Instantaneous Eastward Turbulent Surface Stress (iews);0;1
+
+# : Instantaneous Northward Turbulent Surface Stress [N m**-2]
+#230;;Instantaneous Northward Turbulent Surface Stress (inss);0;1
+
+# : Maximum Temperature At 2 Metres Since Previous Post-processing [K]
+#201;;Maximum Temperature At 2 Metres Since Previous Post-processing (mx2t);-273.15;1;105;2
+
+# : Minimum Temperature At 2 Metres Since Previous Post-processing [K]
+#202;;Minimum Temperature At 2 Metres Since Previous Post-processing (mn2t);-273.15;1;105;2
+
+# : Surface Long-wave (thermal) Radiation Downwards [J m**-2]
+#175;;Surface Long-wave (thermal) Radiation Downwards (strd);0;1
+
+# : Surface Net Long-wave (thermal) Radiation [J m**-2]
+#177;;Surface Net Long-wave (thermal) Radiation (str);0;1
+
+# : Surface Net Short-wave (solar) Radiation [J m**-2]
+#176;;Surface Net Short-wave (solar) Radiation (ssr);0;1
+
+# : Total Column Integrated Water Vapour [unknown]
+#000;;Total Column Integrated Water Vapour ();0;1
+
+# 48: Convective Precipitation [kg m**-2]
+228143;48;Convective Precipitation (cp);0;1
+
+# 55: Large-scale Precipitation [kg m**-2]
+3062;55;Large-scale Precipitation (lsp);0;1
+
+# : 4 [unknown]
+#000;;4 ();0;1
+
+# : 192 [unknown]
+#000;;192 ();0;1
+
+# : 192 [unknown]
+#000;;192 ();0;1;depthBelowLand;3
+
+# : 193 [unknown]
+#000;;193 ();0;1
+
+# : 193 [unknown]
+#000;;193 ();0;1;depthBelowLand;3
+
+# : 198 [unknown]
+#000;;198 ();0;1
+
+# : 201 [unknown]
+#000;;201 ();0;1
+
+# : 254 [unknown]
+#000;;254 ();0;1
+
+# : 254 [unknown]
+#000;;254 ();0;1;depthBelowLand;3
+
+# : Brightness Temperature [unknown]
+#000;;Brightness Temperature ();0;1;;
+
+# : Ceiling [m]
+#260109;;Ceiling (ceil);0;1
+
+# : Cloud Base [unknown]
+#000;;Cloud Base ();0;1
+
+# : Convective Rain Rate [kg m**-2 s**-1]
+#228218;;Convective Rain Rate (crr);0;1
+
+# : Convective Snowfall Water Equivalent [kg m**-2]
+#231057;;Convective Snowfall Water Equivalent (csfwe);0;1
+
+# : Large-scale Snowfall Water Equivalent [kg m**-2]
+#231058;;Large-scale Snowfall Water Equivalent (lsfwe);0;1
+
+# : Large Scale Rain Rate [kg m**-2 s**-1]
+#228219;;Large Scale Rain Rate (lsrr);0;1
+
+# : Minimum Visibility [m]
+#231043;;Minimum Visibility (minvis);0;1
+
+# : Precipitation Type [(Code table 4.201)]
+#260015;;Precipitation Type (ptype);0;1
+
+# : Specific Cloud Liquid Water Content [kg kg**-1]
+#246;;Specific Cloud Liquid Water Content (clwc);0;1
+
+# : Surface Net Long-wave (thermal) Radiation, Clear Sky [J m**-2]
+#211;;Surface Net Long-wave (thermal) Radiation, Clear Sky (strc);0;1
+
+# : Surface Net Short-wave (solar) Radiation, Clear Sky [J m**-2]
+#210;;Surface Net Short-wave (solar) Radiation, Clear Sky (ssrc);0;1
+
+# : Time Integral Of Rain Flux [kg m**-2]
+#235015;;Time Integral Of Rain Flux (tirf);0;1
+
+# : Total Snow Precipitation [kg m**-2]
+#260046;;Total Snow Precipitation (tsnowp);0;1
+

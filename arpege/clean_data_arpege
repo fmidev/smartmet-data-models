@@ -1,0 +1,9 @@
+#!/bin/sh
+# Clean ARPEGE data
+cleaner -maxfiles 4 '_arpege_.*_surface.sqd' /smartmet/data/arpege
+cleaner -maxfiles 4 '_arpege_.*_pressure.sqd' /smartmet/data/arpege
+cleaner -maxfiles 4 '_arpege_.*_surface.sqd' /smartmet/editor/in
+cleaner -maxfiles 4 '_arpege_.*_pressure.sqd' /smartmet/editor/in
+
+# Clean incoming directory older than 4h 
+find /smartmet/data/incoming/arpege -name "arpege*grib2" -mmin +360 -delete >& /dev/null

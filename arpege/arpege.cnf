@@ -1,0 +1,16 @@
+MODEL=arpege
+MODEL_ID=180
+MODEL_RAW_ROOT='/smartmet/data/incoming/arpege'
+#MODEL_RAW_DIR='/${RT_HOUR}'
+MODEL_RAW_DIR='' 
+MODEL_RAW_SFC='\*arpege_025_SP\*.grib2'
+MODEL_RAW_PL='\*arpege_025_IP\*.grib2'
+#MODEL_RAW_ML='\*arpege_025_HP\*.grib2'
+
+MODEL_RAW_MASK='\*arpege_025\*.grib2'
+
+AREA=europe
+
+#CROP=LEFT,BOTTOM,RIGHT,TOP
+CROP=10.7,22.2,73.4,55.8
+

@@ -1,0 +1,9 @@
+# Model available after
+# 00 UTC = 03:40 UTC
+20 * * * * utcrun 4 /smartmet/bin/ingest-model.sh -m arpege
+# 06 UTC = 09:40 UTC
+20 * * * * utcrun 10 /smartmet/bin/ingest-model.sh -m arpege
+# 12 UTC = 15:40 UTC
+20 * * * * utcrun 16 /smartmet/bin/ingest-model.sh -m arpege
+# 18 UTC = 21:40 UTC
+20 * * * * utcrun 22 /smartmet/bin/ingest-model.sh -m arpege

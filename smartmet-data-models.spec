@@ -1,7 +1,7 @@
 %define smartmetroot /smartmet
 
 Name:           smartmet-data-models
-Version:        25.3.13
+Version:        25.5.8
 Release:        1%{?dist}.fmi
 Summary:        SmartMet Data Models Common
 Group:          System Environment/Base
@@ -56,6 +56,13 @@ Requires: smartmet-data-models
 %description wrf
 SmartMet data ingest module for WRF model
 
+%package arpege
+Summary: SmartMet Data ARPEGE
+Requires: smartmet-data-models
+
+%description arpege
+SmartMet data ingest module for ARPEGE model
+
 %install
 rm -rf $RPM_BUILD_ROOT
 mkdir $RPM_BUILD_ROOT
@@ -105,6 +112,13 @@ install -m 644 %_topdir/SOURCES/smartmet-data-models/wrf/wrf.cron %{buildroot}%{
 install -m 755 %_topdir/SOURCES/smartmet-data-models/wrf/clean_data_wrf %{buildroot}%{smartmetroot}/cnf/cron/cron.hourly/
 install -m 644 %_topdir/SOURCES/smartmet-data-models/wrf/wrf-surface.cnf %{buildroot}%{smartmetroot}/run/data/wrf/cnf/
 install -m 644 %_topdir/SOURCES/smartmet-data-models/wrf/wrf-pressure.cnf %{buildroot}%{smartmetroot}/run/data/wrf/cnf/
+
+mkdir -p .%{smartmetroot}/run/data/arpege/{bin,cnf}
+install -m 644 %_topdir/SOURCES/smartmet-data-models/arpege/arpege.cnf %{buildroot}%{smartmetroot}/cnf/data/
+install -m 644 %_topdir/SOURCES/smartmet-data-models/arpege/arpege.cron %{buildroot}%{smartmetroot}/cnf/cron/cron.d/
+install -m 755 %_topdir/SOURCES/smartmet-data-models/arpege/clean_data_arpege %{buildroot}%{smartmetroot}/cnf/cron/cron.hourly/
+install -m 644 %_topdir/SOURCES/smartmet-data-models/arpege/arpege-surface.cnf %{buildroot}%{smartmetroot}/run/data/arpege/cnf/
+install -m 644 %_topdir/SOURCES/smartmet-data-models/arpege/arpege-pressure.cnf %{buildroot}%{smartmetroot}/run/data/arpege/cnf/
 
 # COMMON
 %files
@@ -161,10 +175,21 @@ install -m 644 %_topdir/SOURCES/smartmet-data-models/wrf/wrf-pressure.cnf %{buil
 %config(noreplace) %{smartmetroot}/run/data/wrf/cnf/wrf-surface.cnf
 %config(noreplace) %{smartmetroot}/run/data/wrf/cnf/wrf-pressure.cnf
 
+# ARPEGE
+%files arpege
+%defattr(-,smartmet,smartmet,-)
+%config(noreplace) %{smartmetroot}/cnf/data/arpege.cnf
+%config(noreplace) %{smartmetroot}/cnf/cron/cron.d/arpege.cron
+%config(noreplace) %attr(0755,smartmet,smartmet) %{smartmetroot}/cnf/cron/cron.hourly/clean_data_arpege
+%config(noreplace) %{smartmetroot}/run/data/arpege/cnf/arpege-surface.cnf
+%config(noreplace) %{smartmetroot}/run/data/arpege/cnf/arpege-pressure.cnf
+
 %clean
 rm -rf $RPM_BUILD_ROOT
 
 %changelog
+* Thu May 8 2025 Elmeri Nurmi <elmeri.nurmi@fmi.fi> 25.5.8-1%{?dist}.fmi
+- add ARPEGE model
 * Thu Mar 13 2025 Mikko Rauhala <mikko.rauhala@fmi.fi> 25.3.13-1%{?dist}.fmi
 - add ICON model
 * Thu Oct 19 2023 Mikko Rauhala <mikko.rauhala@fmi.fi> 23.10.19-1%{?dist}.fmi
