@@ -21,7 +21,7 @@ find $INCOMING/ -name "arpege_025*grib2" -mmin +300 -delete
 
 # Define your timestamp and URL prefix
 TS=${MODELDATE}T${RT_HOUR}Z
-PREFIX="https://object.data.gouv.fr/meteofrance-pnt/pnt/${TS}/arpege/025"
+PREFIX="https://object.files.data.gouv.fr/meteofrance-pnt/pnt/${TS}/arpege/025"
 
 # Define the two arrays these are packages and lead times of the model different parameters are in different packages
 array1=(SP1 SP2 IP1)
