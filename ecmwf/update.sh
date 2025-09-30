@@ -7,7 +7,8 @@
 # Ready times(UTC) for ECMWF IFS oper/scda model; 00z 07:55, 06z 13:15, 12z 19:55, 18z 01:15. These are indicative times check valid times during install and set cronjob accordingly.
 set -ex
 
-STEP=12
+# Set forecast cycle
+STEP=6
 RT=`date -u +%s -d '-6 hours'`
 RT="$(( $RT / ($STEP * 3600) * ($STEP * 3600) ))"
 RT_HOUR=`date -u -d@$RT +%H`
