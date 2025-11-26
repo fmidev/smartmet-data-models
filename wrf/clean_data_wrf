@@ -4,3 +4,6 @@ cleaner -maxfiles 4 '_wrf_.*_surface.sqd' /smartmet/data/wrf
 cleaner -maxfiles 4 '_wrf_.*_pressure.sqd' /smartmet/data/wrf
 cleaner -maxfiles 2 '_wrf_.*_surface.sqd' /smartmet/editor/in
 cleaner -maxfiles 2 '_wrf_.*_pressure.sqd' /smartmet/editor/in
+cleaner -maxfiles 4 '_wrf_.*_surface.sqd' /smartmet/data/wrf
+cleaner -maxfiles 4 '_wrf_.*_surface.sqd' /smartmet/data/incoming/wrf/d01
+cleaner -maxfiles 4 '_wrf_.*_surface.sqd' /smartmet/data/incoming/wrf/d02
