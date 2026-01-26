@@ -20,6 +20,7 @@ MODEL_VERSION=0p25
 MODEL_TYPE=oper
 INCOMING_TMP=/smartmet/data/incoming/ecmwf/$RT_DATE/$RT_HOUR
 
+mkdir -p ${INCOMING_TMP}
 
 # Different MODEL_TYPE for 06/18z
 if [ $RT_HOUR -eq 06 ] || [ $RT_HOUR -eq 18 ]
