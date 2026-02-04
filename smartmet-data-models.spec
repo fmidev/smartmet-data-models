@@ -1,7 +1,7 @@
 %define smartmetroot /smartmet
 
 Name:           smartmet-data-models
-Version:        25.5.8
+Version:        26.2.4
 Release:        1%{?dist}.fmi
 Summary:        SmartMet Data Models Common
 Group:          System Environment/Base
@@ -130,6 +130,11 @@ install -m 644 %_topdir/SOURCES/smartmet-data-models/arpege/arpege-pressure.cnf 
 # ECMWF
 %files ecmwf
 %defattr(-,smartmet,smartmet,-)
+%dir %{smartmetroot}/run/data/ecmwf
+%dir %{smartmetroot}/run/data/ecmwf/bin
+%dir %{smartmetroot}/run/data/ecmwf/cnf
+%dir %{smartmetroot}/run/data/ecmwf/cnf/st.surface.d
+%dir %{smartmetroot}/run/data/ecmwf/cnf/st.pressure.d
 %config(noreplace) %{smartmetroot}/cnf/data/ecmwf.cnf
 %config(noreplace) %{smartmetroot}/cnf/cron/cron.d/ecmwf.cron
 %config(noreplace) %attr(0755,smartmet,smartmet) %{smartmetroot}/cnf/cron/cron.hourly/clean_data_ecmwf
@@ -141,6 +146,9 @@ install -m 644 %_topdir/SOURCES/smartmet-data-models/arpege/arpege-pressure.cnf 
 # GSM
 %files gsm
 %defattr(-,smartmet,smartmet,-)
+%dir %{smartmetroot}/run/data/gsm
+%dir %{smartmetroot}/run/data/gsm/bin
+%dir %{smartmetroot}/run/data/gsm/cnf
 %config(noreplace) %{smartmetroot}/cnf/data/gsm.cnf
 %config(noreplace) %{smartmetroot}/cnf/cron/cron.d/gsm.cron
 %config(noreplace) %attr(0755,smartmet,smartmet) %{smartmetroot}/cnf/cron/cron.hourly/clean_data_gsm
@@ -150,6 +158,9 @@ install -m 644 %_topdir/SOURCES/smartmet-data-models/arpege/arpege-pressure.cnf 
 # ICON
 %files icon
 %defattr(-,smartmet,smartmet,-)
+%dir %{smartmetroot}/run/data/icon
+%dir %{smartmetroot}/run/data/icon/bin
+%dir %{smartmetroot}/run/data/icon/cnf
 %config(noreplace) %{smartmetroot}/cnf/data/icon.cnf
 %config(noreplace) %{smartmetroot}/cnf/cron/cron.d/icon.cron
 %config(noreplace) %attr(0755,smartmet,smartmet) %{smartmetroot}/cnf/cron/cron.hourly/clean_data_icon
@@ -159,6 +170,9 @@ install -m 644 %_topdir/SOURCES/smartmet-data-models/arpege/arpege-pressure.cnf 
 # UKMO
 %files ukmo
 %defattr(-,smartmet,smartmet,-)
+%dir %{smartmetroot}/run/data/ukmo
+%dir %{smartmetroot}/run/data/ukmo/bin
+%dir %{smartmetroot}/run/data/ukmo/cnf
 %config(noreplace) %{smartmetroot}/cnf/data/ukmo.cnf
 %config(noreplace) %{smartmetroot}/cnf/cron/cron.d/ukmo.cron
 %config(noreplace) %attr(0755,smartmet,smartmet) %{smartmetroot}/cnf/cron/cron.hourly/clean_data_ukmo
@@ -168,6 +182,9 @@ install -m 644 %_topdir/SOURCES/smartmet-data-models/arpege/arpege-pressure.cnf 
 # WRF
 %files wrf
 %defattr(-,smartmet,smartmet,-)
+%dir %{smartmetroot}/run/data/wrf
+%dir %{smartmetroot}/run/data/wrf/bin
+%dir %{smartmetroot}/run/data/wrf/cnf
 %config(noreplace) %{smartmetroot}/cnf/data/wrf-small.cnf
 %config(noreplace) %{smartmetroot}/cnf/data/wrf-large.cnf
 %config(noreplace) %{smartmetroot}/cnf/cron/cron.d/wrf.cron
@@ -178,6 +195,9 @@ install -m 644 %_topdir/SOURCES/smartmet-data-models/arpege/arpege-pressure.cnf 
 # ARPEGE
 %files arpege
 %defattr(-,smartmet,smartmet,-)
+%dir %{smartmetroot}/run/data/arpege
+%dir %{smartmetroot}/run/data/arpege/bin
+%dir %{smartmetroot}/run/data/arpege/cnf
 %config(noreplace) %{smartmetroot}/cnf/data/arpege.cnf
 %config(noreplace) %{smartmetroot}/cnf/cron/cron.d/arpege.cron
 %config(noreplace) %attr(0755,smartmet,smartmet) %{smartmetroot}/cnf/cron/cron.hourly/clean_data_arpege
@@ -188,6 +208,8 @@ install -m 644 %_topdir/SOURCES/smartmet-data-models/arpege/arpege-pressure.cnf 
 rm -rf $RPM_BUILD_ROOT
 
 %changelog
+* Wed Feb 4 2026 Elmeri Nurmi <elmeri.nurmi@fmi.fi> 26.2.4-1%{?dist}.fmi
+- Fix directory ownership for EL9 (RPM 4.18)
 * Thu May 8 2025 Elmeri Nurmi <elmeri.nurmi@fmi.fi> 25.5.8-1%{?dist}.fmi
 - add ARPEGE model
 * Thu Mar 13 2025 Mikko Rauhala <mikko.rauhala@fmi.fi> 25.3.13-1%{?dist}.fmi
