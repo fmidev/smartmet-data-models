@@ -23,8 +23,7 @@ import sys
 import time
 from typing import List, Optional, Sequence, Union
 
-from ecmwf.opendata import Client
-
+from ecmwf.opendata import Client 
 
 def parse_csv_list(s):
     return [x.strip() for x in s.split(",") if x.strip()]
@@ -307,7 +306,7 @@ def main(argv=None):
         
         # Rename file with analysis time if requested
         if args.add_timestamp:
-            timestamp = result.datetime.strftime("%y%m%d%H")
+            timestamp = result.datetime.strftime("%Y%m%d%H")
             base, ext = os.path.splitext(args.target)
             new_target = "{}_{}{}".format(base, timestamp, ext)
             os.rename(args.target, new_target)
