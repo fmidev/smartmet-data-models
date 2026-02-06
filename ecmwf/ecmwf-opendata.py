@@ -178,6 +178,11 @@ def build_arg_parser():
         action="store_true",
         help="Remove target file if an attempt fails (useful if partial downloads occur).",
     )
+    p.add_argument(
+        "--add-timestamp",
+        action="store_true",
+        help="Add model analysis time (YYMMDDHH) to output filename before extension.",
+    )
 
     return p
 
@@ -299,6 +304,16 @@ def main(argv=None):
 
     if hasattr(result, "datetime"):
         print("Retrieved forecast run datetime (UTC):", result.datetime)
+        
+        # Rename file with analysis time if requested
+        if args.add_timestamp:
+            timestamp = result.datetime.strftime("%y%m%d%H")
+            base, ext = os.path.splitext(args.target)
+            new_target = "{}_{}{}".format(base, timestamp, ext)
+            os.rename(args.target, new_target)
+            print("Renamed to:", new_target)
+    elif args.add_timestamp:
+        print("WARNING: --add-timestamp requested but no datetime in result, keeping original filename.", file=sys.stderr)
 
     return 0
 
