@@ -41,8 +41,26 @@ Model configs located in `/smartmet/cnf/data/`:
 - `<model>.cnf` — Default configuration
 - `<model>-<area>.cnf` — Area-specific configuration
 
+Example of ECMWF opendata cnf, to be used with ecmwf-opendata.py
+```
+MODEL=ecmwf
+MODEL_ID=240
+MODEL_RAW_ROOT='/smartmet/data/incoming/ecmwf'
+MODEL_RAW_DIR=''
+MODEL_RAW_SFC='\*ifs_sfc\*${RT_DATE_MMDD}${RT_HOUR}\*.grib2'
+MODEL_RAW_PL='\*ifs_pl\*${RT_DATE_MMDD}${RT_HOUR}\*.grib2'
+
+MODEL_RAW_MASK='\*.grib2'
+
+AREA=bhutan
+
+#CROP=LEFT,BOTTOM,RIGHT,TOP
+CROP=61,7,103,40
+```
+
 ## Dependencies
 
 - smartmet-qdtools / smartmet-qdconversion
 - eccodes / grib_api
 - curl, pbzip2, rsync
+- python 3.9 
