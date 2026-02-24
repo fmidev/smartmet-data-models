@@ -1,12 +1,42 @@
 MODEL=icon
 MODEL_ID=170
+
+# Area configuration
+AREA=world              # Geographic region name
+CROP=180,-90,180,90     # LEFT,BOTTOM,RIGHT,TOP
+INCR=0.125              # Grid increment in degrees (0.125 = ~14km)
+
+# Data paths
 MODEL_RAW_ROOT='/smartmet/data/incoming/icon'
-MODEL_RAW_DIR='/${RT_HOUR}'
-MODEL_RAW_SFC='\*icon-eu_europe_regular-lat-lon_single-level\*.grib2'
-MODEL_RAW_ML='\*icon-eu_europe_regular-lat-lon_single-level\*.grib2'
+MODEL_RAW_DIR='/${RT_DATE_MMDD}/${RT_HOUR}'
 
-MODEL_RAW_MASK='\*icon-eu_europe_regular-lat-lon\*.grib2'
+# File patterns for processed data
+MODEL_RAW_SFC='\*icosfc\*_allfc_${AREA}.grib2'
+MODEL_RAW_PL='\*icoiso\*_allfc_${AREA}.grib2'
+MODEL_RAW_MASK='\*icon_global_latlon\*_${AREA}.grib2'
 
-AREA=europe
+# Variables to download
+# Surface-level variables
+VARSFC='PMSL PS RELHUM_2M T_2M TD_2M TOT_PREC U_10M V_10M CLCT CAPE_CON'
 
-#CROP=8,39,45,52.5
+# Pressure-level variables
+VARISO='FI RELHUM T U V'
+
+# Pressure levels in hPa
+ISOLEV='1000 925 850 700 500 300 100'
+
+# Forecast lead times in hours
+FCLEAD='000 003 006 009 012 015 018 021 024 027 030 033 036 039 042 045 048 051 054 057 060 063 066 069 072'
+
+ICOHOME=/smartmet/run/data/icon
+ICOBIN=${ICOHOME}/bin                           # Directory containing processing scripts
+ICOGEO=${ICOHOME}/ICON_GLOBAL2WORLD_0125_EASY   # Directory for grid definitions and transformation weights
+ICOINC=${MODEL_RAW_ROOT}                        # Incoming data directory
+
+# DWD OpenData base URL
+OPENDATA_BASE_URL=https://opendata.dwd.de/weather/nwp/icon/grib
+
+# Processing control flags
+FETCH=yes     # Download data from DWD
+TRANS=yes     # Transform coordinates from icosahedral to lat-lon
+HSURF=yes     # Process surface elevation data
