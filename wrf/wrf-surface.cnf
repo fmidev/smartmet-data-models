@@ -65,13 +65,13 @@
 135;140;Vertical Velocity (w);0;1
 
 # 273: Low Cloud Cover [%]
-3073;273;Low Cloud Cover (lcc);0;1;214;0
+228164;273;Low Cloud Cover (lcc);0;1;100;850
 
 # 274: Medium Cloud Cover [%]
-3074;274;Medium Cloud Cover (mcc);0;1;224;0
+228164;274;Medium Cloud Cover (mcc);0;1;100;500
 
 # 275: High Cloud Cover [%]
-3075;275;High Cloud Cover (hcc);0;1;234;0
+228164;275;High Cloud Cover (hcc);0;1;100;300
 
 # 281: Land-sea Mask [(0 - 1)]
 172;281;Land-sea Mask (lsm);0;1
@@ -86,7 +86,7 @@
 3020;407;Visibility (vis);0;1
 
 # 417: Wind Speed (gust) [m s**-1]
-260065;417;Wind Speed (gust) (gust);0;1;105;10
+260065;417;Wind Speed (gust) (gust);0;1
 
 # 472: Surface Pressure [Pa]
 134;472;Surface Pressure (sp);0;0.01
