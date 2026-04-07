@@ -254,14 +254,17 @@ transform_coordinates() {
 download_icon_data() {
     local andate="${RT_DATE}${RT_HOUR}"
     local opendir="${OPENDATA_BASE_URL}/${RT_HOUR}"
+    local dwdftp="${DWDFTP_URL}"
+    local dwddir="${DWDFTP_DIR}/${RT_HOUR}"
     local work_dir="${ICOINC}/${RT_DATE}/${RT_HOUR}"
 
     mkdir -p "$work_dir"
     cd "$work_dir"
 
     echo "=== Downloading ICON data from DWD OpenData ==="
-    echo "Source: $opendir"
+    echo "Source: $opendir for https, $dwdftp for ftp, the same data in both" 
 
+    # Use fetch for curl via http
     fetch() {
         local url="$1"
         local out="$2"
@@ -289,14 +292,19 @@ download_icon_data() {
         return 1
     }
 
+    # When using ftp, use create_lists and ftpmanyfiles
+    create_lists () {
+
+    rm -f sfcfilelst isofilelst
+
     # ---- Surface variables ----
     echo "Surface variables…"
-    local iconamegen="icon_global_icosahedral_single-level"
+    iconamegen="icon_global_icosahedral_single-level"
     for lead in $FCLEAD; do
         for var in $VARSFC; do
-            local fname="${iconamegen}_${andate}_${lead}_${var}.grib2.bz2"
-            local dir=$(echo "$var" | tr '[:upper:]' '[:lower:]')
-            fetch "${opendir}/${dir}/${fname}" "$fname"
+             fname="${iconamegen}_${andate}_${lead}_${var}.grib2.bz2"
+             dir=$(echo "$var" | tr '[:upper:]' '[:lower:]')
+	    echo "${dir}/${fname}"  >> sfcfilelst
         done
     done
 
@@ -306,15 +314,79 @@ download_icon_data() {
     for lev in $ISOLEV; do
         for lead in $FCLEAD; do
             for var in $VARISO; do
-                local fname="${iconamegen}_${andate}_${lead}_${lev}_${var}.grib2.bz2"
-                local dir=$(echo "$var" | tr '[:upper:]' '[:lower:]')
-                fetch "${opendir}/${dir}/${fname}" "$fname"
+                 fname="${iconamegen}_${andate}_${lead}_${lev}_${var}.grib2.bz2"
+                 dir=$(echo "$var" | tr '[:upper:]' '[:lower:]')
+		echo "${dir}/${fname}"  >> isofilelst 
             done
         done
     done
+    }
+    
+    ftpmanyfiles() {
+	HOST="$1"
+	BASE="$2"
+	LIST="$3"
 
-    echo "=== Download complete ==="
-}
+	(
+	    echo "set cmd:parallel 6"
+	    echo "set net:max-retries 5"
+	    echo "set net:reconnect-interval-base 10"
+	    echo "set net:timeout 20"
+	    echo "open $HOST"
+	    echo "cd $BASE"
+
+	    while read -r f; do
+		b=$(basename "$f")
+		echo "get -c $f -o $b"
+	    done < "$LIST"
+
+	    echo "bye"
+	) | lftp
+    }
+    
+    local method="${DOWNLOAD_METHOD:-lftp}"
+    echo "Download method: $method"
+
+    if [ "$method" = "curl" ]; then
+        # ---- Surface variables via HTTPS/curl ----
+        echo "Surface variables…"
+        local iconamegen="icon_global_icosahedral_single-level"
+        for lead in $FCLEAD; do
+            for var in $VARSFC; do
+                local fname="${iconamegen}_${andate}_${lead}_${var}.grib2.bz2"
+                local dir
+                dir=$(echo "$var" | tr '[:upper:]' '[:lower:]')
+                fetch "${opendir}/${dir}/${fname}" "$fname"
+            done
+        done
+
+        # ---- Pressure level variables via HTTPS/curl ----
+        echo "Pressure level variables…"
+        iconamegen="icon_global_icosahedral_pressure-level"
+        for lev in $ISOLEV; do
+            for lead in $FCLEAD; do
+                for var in $VARISO; do
+                    local fname="${iconamegen}_${andate}_${lead}_${lev}_${var}.grib2.bz2"
+                    local dir
+                    dir=$(echo "$var" | tr '[:upper:]' '[:lower:]')
+                    fetch "${opendir}/${dir}/${fname}" "$fname"
+                done
+            done
+        done
+
+        echo "=== Download complete ==="
+    else
+        # ---- Surface and pressure level variables via FTP ----
+        create_lists
+
+        ftpmanyfiles "${dwdftp}" "${dwddir}" sfcfilelst
+        echo "=== READY FTP sfcfiles $(date '+%F %T') ==="
+
+        ftpmanyfiles "${dwdftp}" "${dwddir}" isofilelst
+        echo "=== READY FTP isofiles $(date '+%F %T') ==="
+    fi
+
+} #downloads
 
 ################################################################################
 # Data Transformation and Combination
@@ -352,7 +424,8 @@ process_surface_data() {
                     cat "$outgrib" >> "$combined_file"
                 fi
                 
-                rm -f "$infile"
+                bzip2 "$infile"
+#                rm -f "$infile"
             fi
         done
         
@@ -398,7 +471,8 @@ process_pressure_data() {
                         cat "$outgrib" >> "$level_combined"
                     fi
                     
-                    rm -f "$infile"
+                    bzip2 "$infile"
+                    #rm -f "$infile"
                 fi
             done
         done
@@ -462,7 +536,8 @@ process_surface_elevation() {
             fi
         fi
         
-        rm -f "$infile"
+        #rm -f "$infile"
+	bzip2 "$infile"
     else
         echo "WARNING: Failed to download surface elevation data"
     fi

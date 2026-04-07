@@ -23,7 +23,7 @@ VARSFC='PMSL PS RELHUM_2M T_2M TD_2M TOT_PREC U_10M V_10M CLCT CAPE_CON'
 VARISO='FI RELHUM T U V'
 
 # Pressure levels in hPa
-ISOLEV='1000 925 850 700 500 300 100'
+ISOLEV='1000 925 950 850 800 700 600 500 400 300 250 200 150 100'
 
 # Forecast lead times in hours
 FCLEAD='000 003 006 009 012 015 018 021 024 027 030 033 036 039 042 045 048 051 054 057 060 063 066 069 072'
@@ -35,8 +35,11 @@ ICOINC=${MODEL_RAW_ROOT}                        # Incoming data directory
 
 # DWD OpenData base URL
 OPENDATA_BASE_URL=https://opendata.dwd.de/weather/nwp/icon/grib
+DWDFTP_URL=ftp://opendata.dwd.de
+DWDFTP_DIR=weather/nwp/icon/grib
 
 # Processing control flags
-FETCH=yes     # Download data from DWD
-TRANS=yes     # Transform coordinates from icosahedral to lat-lon
-HSURF=yes     # Process surface elevation data
+FETCH=yes              # Download data from DWD
+DOWNLOAD_METHOD=lftp   # Download method: lftp or curl
+TRANS=yes              # Transform coordinates from icosahedral to lat-lon
+HSURF=yes              # Process surface elevation data
