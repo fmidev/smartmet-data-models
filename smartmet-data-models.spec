@@ -117,6 +117,7 @@ mkdir -p .%{smartmetroot}/run/data/arpege/{bin,cnf}
 install -m 644 %_topdir/SOURCES/smartmet-data-models/arpege/arpege.cnf %{buildroot}%{smartmetroot}/cnf/data/
 install -m 644 %_topdir/SOURCES/smartmet-data-models/arpege/arpege.cron %{buildroot}%{smartmetroot}/cnf/cron/cron.d/
 install -m 755 %_topdir/SOURCES/smartmet-data-models/arpege/clean_data_arpege %{buildroot}%{smartmetroot}/cnf/cron/cron.hourly/
+install -m 755 %_topdir/SOURCES/smartmet-data-models/arpege/update.sh %{buildroot}%{smartmetroot}/run/data/arpege/bin/
 install -m 644 %_topdir/SOURCES/smartmet-data-models/arpege/arpege-surface.cnf %{buildroot}%{smartmetroot}/run/data/arpege/cnf/
 install -m 644 %_topdir/SOURCES/smartmet-data-models/arpege/arpege-pressure.cnf %{buildroot}%{smartmetroot}/run/data/arpege/cnf/
 
@@ -201,6 +202,7 @@ install -m 644 %_topdir/SOURCES/smartmet-data-models/arpege/arpege-pressure.cnf 
 %config(noreplace) %{smartmetroot}/cnf/data/arpege.cnf
 %config(noreplace) %{smartmetroot}/cnf/cron/cron.d/arpege.cron
 %config(noreplace) %attr(0755,smartmet,smartmet) %{smartmetroot}/cnf/cron/cron.hourly/clean_data_arpege
+%attr(0755,smartmet,smartmet) %{smartmetroot}/run/data/arpege/bin/update.sh
 %config(noreplace) %{smartmetroot}/run/data/arpege/cnf/arpege-surface.cnf
 %config(noreplace) %{smartmetroot}/run/data/arpege/cnf/arpege-pressure.cnf
 
