@@ -3,15 +3,34 @@ name: Build RPM Packages
 on:
   push:
     branches: [ master ]
-    tags:
-      - 'v*'
   pull_request:
     branches: [ master ]
   workflow_dispatch:
 
 jobs:
+  version:
+    name: Read version from spec file
+    runs-on: ubuntu-latest
+    outputs:
+      version: ${{ steps.specver.outputs.version }}
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Extract spec version
+        id: specver
+        run: |
+          VERSION=$(awk '/^Version:/ {print $2; exit}' smartmet-data-models.spec)
+          if [ -z "$VERSION" ]; then
+            echo "Failed to read Version from smartmet-data-models.spec" >&2
+            exit 1
+          fi
+          echo "version=$VERSION" >> "$GITHUB_OUTPUT"
+          echo "Spec version: $VERSION"
+
   build-rpms:
     name: Build RPM on ${{ matrix.os }}
+    needs: version
     runs-on: ubuntu-latest
     strategy:
       matrix:
@@ -21,14 +40,14 @@ jobs:
             tag: '8'
           - os: rocky9
             tag: '9'
-    
+
     container:
       image: rockylinux:${{ matrix.tag }}
-      
+
     steps:
       - name: Check out repository
         uses: actions/checkout@v4
-        
+
       - name: Install build dependencies
         run: |
           dnf -y install \
@@ -39,24 +58,24 @@ jobs:
             rpm-devel \
             rpmlint \
             tree
-            
+
       - name: Set up RPM build environment
         run: |
           mkdir -p ~/rpmbuild/{BUILD,RPMS,SOURCES,SPECS,SRPMS}
           mkdir -p ~/rpmbuild/SOURCES/smartmet-data-models
           cp ./*.spec ~/rpmbuild/SPECS/
           cp -r ./* ~/rpmbuild/SOURCES/smartmet-data-models
-          
+
       - name: Build RPM package
         run: |
           cd ~/rpmbuild/SPECS
           rpmbuild -ba *.spec
-          
+
       - name: List generated RPMs
         run: |
           tree ~/rpmbuild/RPMS/
           tree ~/rpmbuild/SRPMS/
-          
+
       - name: Upload RPM artifacts
         uses: actions/upload-artifact@v4
         with:
@@ -67,8 +86,8 @@ jobs:
           retention-days: 7
 
   create-release:
-    needs: build-rpms
-    if: startsWith(github.ref, 'refs/tags/v')
+    needs: [version, build-rpms]
+    if: github.event_name == 'push' && github.ref == 'refs/heads/master'
     runs-on: ubuntu-latest
     permissions:
       contents: write
@@ -77,9 +96,11 @@ jobs:
         uses: actions/download-artifact@v4
         with:
           path: artifacts
-          
+
       - name: Create Release
         uses: softprops/action-gh-release@v1
         with:
-          files: artifacts/**/*
+          tag_name: v${{ needs.version.outputs.version }}
+          name: v${{ needs.version.outputs.version }}
+          files: artifacts/**/*.rpm
           generate_release_notes: true
