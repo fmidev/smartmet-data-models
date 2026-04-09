@@ -58,7 +58,6 @@ jobs:
             gcc \
             make \
             rpm-devel \
-            rpmlint \
             tree
 
       - name: Set up RPM build environment
