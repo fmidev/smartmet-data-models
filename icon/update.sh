@@ -558,6 +558,12 @@ main() {
     
     # Load configuration
     load_config
+        
+    # When AREA=europe the ICON-EU is handled separately
+    if [ "${SKIP_UPDATE:-no}" = "yes" ]; then
+        echo "SKIP_UPDATE=yes — update.sh is disabled for AREA=${AREA}. Exiting."
+        exit 0
+    fi
     
     # Calculate forecast cycle
     calculate_forecast_cycle
