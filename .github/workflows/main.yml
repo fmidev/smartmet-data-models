@@ -34,12 +34,14 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        os: ['rocky8', 'rocky9']
+        os: ['rocky8', 'rocky9', 'rocky10']
         include:
           - os: rocky8
             tag: '8'
           - os: rocky9
             tag: '9'
+          - os: rocky10
+            tag: '10'
 
     container:
       image: rockylinux:${{ matrix.tag }}
