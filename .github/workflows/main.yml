@@ -44,7 +44,7 @@ jobs:
             tag: '10'
 
     container:
-      image: rockylinux:${{ matrix.tag }}
+      image: rockylinux/rockylinux:${{ matrix.tag }}
 
     steps:
       - name: Check out repository
