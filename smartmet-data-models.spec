@@ -94,6 +94,7 @@ install -m 644 %_topdir/SOURCES/smartmet-data-models/gsm/gsm-surface.cnf %{build
 install -m 644 %_topdir/SOURCES/smartmet-data-models/gsm/gsm-pressure.cnf %{buildroot}%{smartmetroot}/run/data/gsm/cnf/
 
 mkdir -p .%{smartmetroot}/run/data/icon/{bin,cnf}
+mkdir -p .%{smartmetroot}/data/incoming/icon
 install -m 644 %_topdir/SOURCES/smartmet-data-models/icon/icon.cnf %{buildroot}%{smartmetroot}/cnf/data/
 install -m 644 %_topdir/SOURCES/smartmet-data-models/icon/icon.cron %{buildroot}%{smartmetroot}/cnf/cron/cron.d/
 install -m 755 %_topdir/SOURCES/smartmet-data-models/icon/clean_data_icon %{buildroot}%{smartmetroot}/cnf/cron/cron.hourly/
@@ -162,6 +163,7 @@ install -m 644 %_topdir/SOURCES/smartmet-data-models/arpege/arpege-pressure.cnf 
 # ICON
 %files icon
 %defattr(-,smartmet,smartmet,-)
+%dir %{smartmetroot}/data/incoming/icon
 %dir %{smartmetroot}/run/data/icon
 %dir %{smartmetroot}/run/data/icon/bin
 %dir %{smartmetroot}/run/data/icon/cnf
@@ -215,7 +217,7 @@ rm -rf $RPM_BUILD_ROOT
 
 %changelog
 * Fri Apr 10 2026 Mikael Hasu <mikael.hasu@fmi.fi> 26.4.10-1%{?dist}.fmi
-- Add update.sh to ICON global and added cdo, lftp
+- Add update.sh to ICON global, added cdo/lftp and incoming directory
 * Thu Apr 9 2026 Elmeri Nurmi <elmeri.nurmi@fmi.fi> 26.4.9-1%{?dist}.fmi
 - Add update.sh to arpege
 * Wed Feb 4 2026 Elmeri Nurmi <elmeri.nurmi@fmi.fi> 26.2.4-1%{?dist}.fmi

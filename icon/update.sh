@@ -558,6 +558,9 @@ main() {
     
     # Load configuration
     load_config
+
+    # Ensure incoming data directory exists
+    mkdir -p "${ICOINC}"
         
     # When AREA=europe the ICON-EU is handled separately
     if [ "${SKIP_UPDATE:-no}" = "yes" ]; then
