@@ -14,7 +14,9 @@ BuildArch:	noarch
 %{?el7:Requires: smartmet-qdtools}
 %{?el6:Requires: grib_api}
 %{?el7:Requires: eccodes}
+Requires: cdo
 Requires: curl
+Requires: lftp
 Requires: pbzip2
 Requires: rsync
 
@@ -213,7 +215,7 @@ rm -rf $RPM_BUILD_ROOT
 
 %changelog
 * Fri Apr 10 2026 Mikael Hasu <mikael.hasu@fmi.fi> 26.4.10-1%{?dist}.fmi
-- Add update.sh to ICON global
+- Add update.sh to ICON global and added cdo, lftp
 * Thu Apr 9 2026 Elmeri Nurmi <elmeri.nurmi@fmi.fi> 26.4.9-1%{?dist}.fmi
 - Add update.sh to arpege
 * Wed Feb 4 2026 Elmeri Nurmi <elmeri.nurmi@fmi.fi> 26.2.4-1%{?dist}.fmi
