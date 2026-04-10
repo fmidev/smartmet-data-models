@@ -31,7 +31,7 @@ set -euo pipefail
 
 load_config() {
     local possible_configs=(
-       "/smartmet/cnf/data/icon-${AREA}.cnf"  "/smartmet/cnf/data/icon.cnf" 
+        "/smartmet/cnf/data/icon.cnf" 
     )
     
     local CONFIG_FILE=""

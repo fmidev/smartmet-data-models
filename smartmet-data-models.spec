@@ -1,7 +1,7 @@
 %define smartmetroot /smartmet
 
 Name:           smartmet-data-models
-Version:        26.4.9
+Version:        26.4.10
 Release:        1%{?dist}.fmi
 Summary:        SmartMet Data Models Common
 Group:          System Environment/Base
@@ -95,6 +95,7 @@ mkdir -p .%{smartmetroot}/run/data/icon/{bin,cnf}
 install -m 644 %_topdir/SOURCES/smartmet-data-models/icon/icon.cnf %{buildroot}%{smartmetroot}/cnf/data/
 install -m 644 %_topdir/SOURCES/smartmet-data-models/icon/icon.cron %{buildroot}%{smartmetroot}/cnf/cron/cron.d/
 install -m 755 %_topdir/SOURCES/smartmet-data-models/icon/clean_data_icon %{buildroot}%{smartmetroot}/cnf/cron/cron.hourly/
+install -m 755 %_topdir/SOURCES/smartmet-data-models/icon/update.sh %{buildroot}%{smartmetroot}/run/data/icon/bin/
 install -m 644 %_topdir/SOURCES/smartmet-data-models/icon/icon-surface.cnf %{buildroot}%{smartmetroot}/run/data/icon/cnf/
 install -m 644 %_topdir/SOURCES/smartmet-data-models/icon/icon-pressure.cnf %{buildroot}%{smartmetroot}/run/data/icon/cnf/
 
@@ -165,6 +166,7 @@ install -m 644 %_topdir/SOURCES/smartmet-data-models/arpege/arpege-pressure.cnf 
 %config(noreplace) %{smartmetroot}/cnf/data/icon.cnf
 %config(noreplace) %{smartmetroot}/cnf/cron/cron.d/icon.cron
 %config(noreplace) %attr(0755,smartmet,smartmet) %{smartmetroot}/cnf/cron/cron.hourly/clean_data_icon
+%attr(0755,smartmet,smartmet) %{smartmetroot}/run/data/icon/bin/update.sh
 %config(noreplace) %{smartmetroot}/run/data/icon/cnf/icon-surface.cnf
 %config(noreplace) %{smartmetroot}/run/data/icon/cnf/icon-pressure.cnf
 
@@ -210,6 +212,8 @@ install -m 644 %_topdir/SOURCES/smartmet-data-models/arpege/arpege-pressure.cnf 
 rm -rf $RPM_BUILD_ROOT
 
 %changelog
+* Fri Apr 10 2026 Mikael Hasu <mikael.hasu@fmi.fi> 26.4.10-1%{?dist}.fmi
+- Add update.sh to ICON global
 * Thu Apr 9 2026 Elmeri Nurmi <elmeri.nurmi@fmi.fi> 26.4.9-1%{?dist}.fmi
 - Add update.sh to arpege
 * Wed Feb 4 2026 Elmeri Nurmi <elmeri.nurmi@fmi.fi> 26.2.4-1%{?dist}.fmi
