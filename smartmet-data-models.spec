@@ -1,7 +1,7 @@
 %define smartmetroot /smartmet
 
 Name:           smartmet-data-models
-Version:        26.4.10
+Version:        26.4.14
 Release:        1%{?dist}.fmi
 Summary:        SmartMet Data Models Common
 Group:          System Environment/Base
@@ -94,6 +94,7 @@ install -m 644 %_topdir/SOURCES/smartmet-data-models/gsm/gsm-surface.cnf %{build
 install -m 644 %_topdir/SOURCES/smartmet-data-models/gsm/gsm-pressure.cnf %{buildroot}%{smartmetroot}/run/data/gsm/cnf/
 
 mkdir -p .%{smartmetroot}/run/data/icon/{bin,cnf}
+mkdir -p .%{smartmetroot}/run/data/icon/cnf/st.surface.d
 mkdir -p .%{smartmetroot}/data/incoming/icon
 install -m 644 %_topdir/SOURCES/smartmet-data-models/icon/icon.cnf %{buildroot}%{smartmetroot}/cnf/data/
 install -m 644 %_topdir/SOURCES/smartmet-data-models/icon/icon.cron %{buildroot}%{smartmetroot}/cnf/cron/cron.d/
@@ -101,6 +102,7 @@ install -m 755 %_topdir/SOURCES/smartmet-data-models/icon/clean_data_icon %{buil
 install -m 755 %_topdir/SOURCES/smartmet-data-models/icon/update.sh %{buildroot}%{smartmetroot}/run/data/icon/bin/
 install -m 644 %_topdir/SOURCES/smartmet-data-models/icon/icon-surface.cnf %{buildroot}%{smartmetroot}/run/data/icon/cnf/
 install -m 644 %_topdir/SOURCES/smartmet-data-models/icon/icon-pressure.cnf %{buildroot}%{smartmetroot}/run/data/icon/cnf/
+install -m 644 %_topdir/SOURCES/smartmet-data-models/icon/st.surface.d/rr1h-353.st %{buildroot}%{smartmetroot}/run/data/icon/cnf/st.surface.d/
 
 mkdir -p .%{smartmetroot}/run/data/ukmo/{bin,cnf}
 install -m 644 %_topdir/SOURCES/smartmet-data-models/ukmo/ukmo.cnf %{buildroot}%{smartmetroot}/cnf/data/
@@ -110,12 +112,14 @@ install -m 644 %_topdir/SOURCES/smartmet-data-models/ukmo/ukmo-surface.cnf %{bui
 install -m 644 %_topdir/SOURCES/smartmet-data-models/ukmo/ukmo-pressure.cnf %{buildroot}%{smartmetroot}/run/data/ukmo/cnf/
 
 mkdir -p .%{smartmetroot}/run/data/wrf/{bin,cnf}
+mkdir -p .%{smartmetroot}/run/data/wrf/cnf/st.surface.d
 install -m 644 %_topdir/SOURCES/smartmet-data-models/wrf/wrf-large.cnf %{buildroot}%{smartmetroot}/cnf/data/
 install -m 644 %_topdir/SOURCES/smartmet-data-models/wrf/wrf-small.cnf %{buildroot}%{smartmetroot}/cnf/data/
 install -m 644 %_topdir/SOURCES/smartmet-data-models/wrf/wrf.cron %{buildroot}%{smartmetroot}/cnf/cron/cron.d/
 install -m 755 %_topdir/SOURCES/smartmet-data-models/wrf/clean_data_wrf %{buildroot}%{smartmetroot}/cnf/cron/cron.hourly/
 install -m 644 %_topdir/SOURCES/smartmet-data-models/wrf/wrf-surface.cnf %{buildroot}%{smartmetroot}/run/data/wrf/cnf/
 install -m 644 %_topdir/SOURCES/smartmet-data-models/wrf/wrf-pressure.cnf %{buildroot}%{smartmetroot}/run/data/wrf/cnf/
+install -m 644 %_topdir/SOURCES/smartmet-data-models/wrf/st.surface.d/rr1h-353.st %{buildroot}%{smartmetroot}/run/data/wrf/cnf/st.surface.d/
 
 mkdir -p .%{smartmetroot}/run/data/arpege/{bin,cnf}
 install -m 644 %_topdir/SOURCES/smartmet-data-models/arpege/arpege.cnf %{buildroot}%{smartmetroot}/cnf/data/
@@ -167,12 +171,14 @@ install -m 644 %_topdir/SOURCES/smartmet-data-models/arpege/arpege-pressure.cnf 
 %dir %{smartmetroot}/run/data/icon
 %dir %{smartmetroot}/run/data/icon/bin
 %dir %{smartmetroot}/run/data/icon/cnf
+%dir %{smartmetroot}/run/data/icon/cnf/st.surface.d
 %config(noreplace) %{smartmetroot}/cnf/data/icon.cnf
 %config(noreplace) %{smartmetroot}/cnf/cron/cron.d/icon.cron
 %config(noreplace) %attr(0755,smartmet,smartmet) %{smartmetroot}/cnf/cron/cron.hourly/clean_data_icon
 %attr(0755,smartmet,smartmet) %{smartmetroot}/run/data/icon/bin/update.sh
 %config(noreplace) %{smartmetroot}/run/data/icon/cnf/icon-surface.cnf
 %config(noreplace) %{smartmetroot}/run/data/icon/cnf/icon-pressure.cnf
+%config(noreplace) %{smartmetroot}/run/data/icon/cnf/st.surface.d/rr1h-353.st
 
 # UKMO
 %files ukmo
@@ -192,12 +198,14 @@ install -m 644 %_topdir/SOURCES/smartmet-data-models/arpege/arpege-pressure.cnf 
 %dir %{smartmetroot}/run/data/wrf
 %dir %{smartmetroot}/run/data/wrf/bin
 %dir %{smartmetroot}/run/data/wrf/cnf
+%dir %{smartmetroot}/run/data/wrf/cnf/st.surface.d
 %config(noreplace) %{smartmetroot}/cnf/data/wrf-small.cnf
 %config(noreplace) %{smartmetroot}/cnf/data/wrf-large.cnf
 %config(noreplace) %{smartmetroot}/cnf/cron/cron.d/wrf.cron
 %config(noreplace) %attr(0755,smartmet,smartmet) %{smartmetroot}/cnf/cron/cron.hourly/clean_data_wrf
 %config(noreplace) %{smartmetroot}/run/data/wrf/cnf/wrf-surface.cnf
 %config(noreplace) %{smartmetroot}/run/data/wrf/cnf/wrf-pressure.cnf
+%config(noreplace) %{smartmetroot}/run/data/wrf/cnf/st.surface.d/rr1h-353.st
 
 # ARPEGE
 %files arpege
@@ -216,6 +224,8 @@ install -m 644 %_topdir/SOURCES/smartmet-data-models/arpege/arpege-pressure.cnf 
 rm -rf $RPM_BUILD_ROOT
 
 %changelog
+* Fri Apr 14 2026 Mikael Hasu <mikael.hasu@fmi.fi> 26.4.14-1%{?dist}.fmi
+- Add st.surface.d and rr1h for icon and wrf
 * Fri Apr 10 2026 Mikael Hasu <mikael.hasu@fmi.fi> 26.4.10-1%{?dist}.fmi
 - Add update.sh to ICON global, added cdo/lftp and incoming directory
 * Thu Apr 9 2026 Elmeri Nurmi <elmeri.nurmi@fmi.fi> 26.4.9-1%{?dist}.fmi
