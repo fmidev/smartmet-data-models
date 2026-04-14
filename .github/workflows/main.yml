@@ -78,7 +78,7 @@ jobs:
           tree ~/rpmbuild/SRPMS/
 
       - name: Upload RPM artifacts
-        uses: actions/upload-artifact@v5
+        uses: actions/upload-artifact@v6
         with:
           name: rpms-${{ matrix.os }}
           path: |
@@ -94,14 +94,27 @@ jobs:
       contents: write
     steps:
       - name: Download all artifacts
-        uses: actions/download-artifact@v5
+        uses: actions/download-artifact@v7
         with:
           path: artifacts
 
       - name: Create Release
-        uses: softprops/action-gh-release@v2
-        with:
-          tag_name: v${{ needs.version.outputs.version }}
-          name: v${{ needs.version.outputs.version }}
-          files: artifacts/**/*.rpm
-          generate_release_notes: true
+        env:
+          GH_TOKEN: ${{ github.token }}
+          TAG: v${{ needs.version.outputs.version }}
+        run: |
+          mapfile -d '' FILES < <(find artifacts -type f -name '*.rpm' -print0)
+          if [ ${#FILES[@]} -eq 0 ]; then
+            echo "No RPM files found under artifacts/" >&2
+            exit 1
+          fi
+          if gh release view "$TAG" --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1; then
+            echo "Release $TAG already exists; replacing assets"
+            gh release upload "$TAG" "${FILES[@]}" --clobber --repo "$GITHUB_REPOSITORY"
+          else
+            echo "Creating release $TAG"
+            gh release create "$TAG" "${FILES[@]}" \
+              --title "$TAG" \
+              --generate-notes \
+              --repo "$GITHUB_REPOSITORY"
+          fi
