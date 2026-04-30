@@ -71,7 +71,7 @@
 34;162;Sea Surface Temperature (sst);-273.15;1
 
 # 263: Instantaneous Total Lightning Flash Density [km**-2 day**-1]
-228050;263;Instantaneous Total Lightning Flash Density (litoti);0;1;entireAtmosphere;0
+#228050;263;Instantaneous Total Lightning Flash Density (litoti);0;1;entireAtmosphere;0
 
 # 273: Low Cloud Cover [(0 - 1)]
 186;273;Low Cloud Cover (lcc);0;100
