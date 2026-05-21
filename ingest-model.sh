@@ -179,6 +179,8 @@ gribstepcount() {
 
 qdstepcount() {
     local FILE=$1
+    # No file yet (e.g. first run) => 0 steps, so the caller treats it as incomplete
+    [ -s "$FILE" ] || { echo 0; return; }
     qdinfo -t -q $FILE | grep Timesteps | cut -d= -f2| tr -d ' '
 }
 
@@ -288,6 +290,8 @@ process() {
 
     if [ -s $SQD ] && [ -d $CNF/st.$LEVEL.d ]; then
         for SCRIPT in $CNF/st.$LEVEL.d/*-*.st; do
+            # Skip when the glob matched nothing (no .st files present)
+            [ -e "$SCRIPT" ] || continue
             PAR=$(basename ${SCRIPT%.*}|cut -d- -f2)
             PARNAME=$(basename ${SCRIPT%.*}|cut -d- -f1)
             log INFO "Post process: $(basename $SQD) parameter $PAR"
@@ -354,6 +358,7 @@ fi
 # Surface Data
 #
 if [ -n "${RUN_SFC:-}" ] && [ -z $SFCDONE ]; then
+    mkdir -p "$(dirname "$OUTFILE_SFC")"
     TMPFILE_SFC=$TMP/$(basename $OUTFILE_SFC)
 
     eval convert $MODEL $MODEL_ID "$MODEL_RAW_ROOT$MODEL_RAW_DIR/$MODEL_RAW_SFC" $TMPFILE_SFC
@@ -376,6 +381,7 @@ fi # surface
 # Pressure Levels
 #
 if [ -n "${RUN_PL:-}" ] && [ -z $PLDONE ]; then
+    mkdir -p "$(dirname "$OUTFILE_PL")"
     TMPFILE_PL=$TMP/$(basename $OUTFILE_PL)
     eval convert $MODEL $MODEL_ID "$MODEL_RAW_ROOT$MODEL_RAW_DIR/$MODEL_RAW_PL" $TMPFILE_PL
     if [ -z $DEBUG ]; then
@@ -387,6 +393,7 @@ fi # pressure
 # Hybrid (model) Levels
 #
 if [ -n "${RUN_ML:-}" ] && [ -n "${MODEL_RAW_ML:-}" ] && [ -z $MLDONE ]; then
+    mkdir -p "$(dirname "$OUTFILE_ML")"
     TMPFILE_ML=$TMP/$(basename $OUTFILE_ML)
     eval convert $MODEL $MODEL_ID "$MODEL_RAW_ROOT$MODEL_RAW_DIR/$MODEL_RAW_ML" $TMPFILE_ML
     if [ -z $DEBUG ]; then
