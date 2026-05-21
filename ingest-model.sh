@@ -174,7 +174,10 @@ OUTFILE_ML=$OUT/hybrid/querydata/${OUTNAME}_hybrid.sqd
 
 gribstepcount() {
     local FILES=$1
-    grib_get -p startStep $FILES|sort -nu|wc -l
+    # endStep (period end / valid time), not startStep: accumulated fields
+    # carry a step range whose start is earlier than the valid time, so
+    # startStep under-counts and the completeness check never matches.
+    grib_get -p endStep $FILES|sort -nu|wc -l
 }
 
 qdstepcount() {
