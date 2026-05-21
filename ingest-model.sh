@@ -42,13 +42,15 @@ if [ $# -eq 0 ]; then
     printf "\t%s\t%s\n" "-t yyyymmddThh" "reference time"
     printf "\t%s\t%s\n" "-i input" "input grib file (over rides reference time)"
     printf "\t%s\t%s\n" "-p projection" "target projection"
+    printf "\t%s\t%s\n" "-l levels" "comma-separated subset of sfc,pl,ml (default: all)"
+    printf "\t%s\t\t%s\n" "-n" "no update, skip running run/data/<model>/bin/update.sh"
     printf "\t%s\t\t%s\n" "-d" "debug, do not distribute"
     printf "\t%s\t\t%s\n" "-f" "force"
     exit 1
 fi
 
 # Parse options
-while getopts  "a:dfi:m:p:t:" flag
+while getopts  "a:dfi:l:m:np:t:" flag
 do
     case "$flag" in
 	a) AREA=$OPTARG;;
@@ -56,10 +58,29 @@ do
 	p) PROJECTION=$OPTARG;;
 	t) RT=$(date +%s -d "$OPTARG");;
     i) IN=$OPTARG;;
+    l)
+        IFS=',' read -ra _levels <<< "$OPTARG"
+        for _lvl in "${_levels[@]}"; do
+            case "$_lvl" in
+                sfc) RUN_SFC=1 ;;
+                pl)  RUN_PL=1 ;;
+                ml)  RUN_ML=1 ;;
+                *)   echo "Unknown level '$_lvl' (expected sfc, pl, or ml)" >&2; exit 1 ;;
+            esac
+        done
+        ;;
+    n) NO_UPDATE=1;;
 	d) DEBUG=1;;
 	f) FORCE=1;;
     esac
 done
+
+# Default: when -l isn't given, run all level blocks (preserves prior behaviour)
+if [ -z "${RUN_SFC:-}" ] && [ -z "${RUN_PL:-}" ] && [ -z "${RUN_ML:-}" ]; then
+    RUN_SFC=1
+    RUN_PL=1
+    RUN_ML=1
+fi
 
 # Defaults
 if [ -z "$MODEL" ]; then
@@ -91,7 +112,9 @@ fi
 
 CONVERT_OPTIONS="${CONVERT_OPTIONS:-} ${CROP:+"-G $CROP"} ${PROJECTION:+"-P $PROJECTION"}"
 
-if [ -s $BASE/run/data/${MODEL}/bin/update.sh ]; then
+if [ -n "${NO_UPDATE:-}" ]; then
+    log INFO "Skipping update.sh (-n)"
+elif [ -s $BASE/run/data/${MODEL}/bin/update.sh ]; then
     log INFO "Running $BASE/run/data/${MODEL}/bin/update.sh"
     $BASE/run/data/${MODEL}/bin/update.sh
 fi
@@ -151,11 +174,16 @@ OUTFILE_ML=$OUT/hybrid/querydata/${OUTNAME}_hybrid.sqd
 
 gribstepcount() {
     local FILES=$1
-    grib_get -p startStep $FILES|sort -nu|wc -l
+    # endStep (period end / valid time), not startStep: accumulated fields
+    # carry a step range whose start is earlier than the valid time, so
+    # startStep under-counts and the completeness check never matches.
+    grib_get -p endStep $FILES|sort -nu|wc -l
 }
 
 qdstepcount() {
     local FILE=$1
+    # No file yet (e.g. first run) => 0 steps, so the caller treats it as incomplete
+    [ -s "$FILE" ] || { echo 0; return; }
     qdinfo -t -q $FILE | grep Timesteps | cut -d= -f2| tr -d ' '
 }
 
@@ -265,6 +293,8 @@ process() {
 
     if [ -s $SQD ] && [ -d $CNF/st.$LEVEL.d ]; then
         for SCRIPT in $CNF/st.$LEVEL.d/*-*.st; do
+            # Skip when the glob matched nothing (no .st files present)
+            [ -e "$SCRIPT" ] || continue
             PAR=$(basename ${SCRIPT%.*}|cut -d- -f2)
             PARNAME=$(basename ${SCRIPT%.*}|cut -d- -f1)
             log INFO "Post process: $(basename $SQD) parameter $PAR"
@@ -330,7 +360,8 @@ fi
 #
 # Surface Data
 #
-if [ -z $SFCDONE ]; then
+if [ -n "${RUN_SFC:-}" ] && [ -z $SFCDONE ]; then
+    mkdir -p "$(dirname "$OUTFILE_SFC")"
     TMPFILE_SFC=$TMP/$(basename $OUTFILE_SFC)
 
     eval convert $MODEL $MODEL_ID "$MODEL_RAW_ROOT$MODEL_RAW_DIR/$MODEL_RAW_SFC" $TMPFILE_SFC
@@ -352,7 +383,8 @@ fi # surface
 #
 # Pressure Levels
 #
-if [ -z $PLDONE ]; then
+if [ -n "${RUN_PL:-}" ] && [ -z $PLDONE ]; then
+    mkdir -p "$(dirname "$OUTFILE_PL")"
     TMPFILE_PL=$TMP/$(basename $OUTFILE_PL)
     eval convert $MODEL $MODEL_ID "$MODEL_RAW_ROOT$MODEL_RAW_DIR/$MODEL_RAW_PL" $TMPFILE_PL
     if [ -z $DEBUG ]; then
@@ -363,7 +395,8 @@ fi # pressure
 #
 # Hybrid (model) Levels
 #
-if [ -n "${MODEL_RAW_ML:-}" ] && [ -z $MLDONE ]; then
+if [ -n "${RUN_ML:-}" ] && [ -n "${MODEL_RAW_ML:-}" ] && [ -z $MLDONE ]; then
+    mkdir -p "$(dirname "$OUTFILE_ML")"
     TMPFILE_ML=$TMP/$(basename $OUTFILE_ML)
     eval convert $MODEL $MODEL_ID "$MODEL_RAW_ROOT$MODEL_RAW_DIR/$MODEL_RAW_ML" $TMPFILE_ML
     if [ -z $DEBUG ]; then
