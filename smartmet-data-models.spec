@@ -81,12 +81,14 @@ install -m 755 %_topdir/SOURCES/smartmet-data-models/grib2cnf %{buildroot}%{smar
 
 mkdir -p .%{smartmetroot}/run/data/ecmwf/{bin,cnf}
 mkdir -p .%{smartmetroot}/run/data/ecmwf/cnf/{st.surface.d,st.pressure.d}
+mkdir -p .%{smartmetroot}/data/ecmwf/world/{surface,pressure}/querydata
 install -m 644 %_topdir/SOURCES/smartmet-data-models/ecmwf/ecmwf.cnf %{buildroot}%{smartmetroot}/cnf/data/
 install -m 644 %_topdir/SOURCES/smartmet-data-models/ecmwf/ecmwf.cron %{buildroot}%{smartmetroot}/cnf/cron/cron.d/
 install -m 755 %_topdir/SOURCES/smartmet-data-models/ecmwf/clean_data_ecmwf %{buildroot}%{smartmetroot}/cnf/cron/cron.hourly/
 install -m 644 %_topdir/SOURCES/smartmet-data-models/ecmwf/ecmwf-{surface,pressure}.{cnf,st} %{buildroot}%{smartmetroot}/run/data/ecmwf/cnf/
 
 mkdir -p .%{smartmetroot}/run/data/gsm/{bin,cnf}
+mkdir -p .%{smartmetroot}/data/gsm/world/{surface,pressure}/querydata
 install -m 644 %_topdir/SOURCES/smartmet-data-models/gsm/gsm.cnf %{buildroot}%{smartmetroot}/cnf/data/
 install -m 644 %_topdir/SOURCES/smartmet-data-models/gsm/gsm.cron %{buildroot}%{smartmetroot}/cnf/cron/cron.d/
 install -m 755 %_topdir/SOURCES/smartmet-data-models/gsm/clean_data_gsm %{buildroot}%{smartmetroot}/cnf/cron/cron.hourly/
@@ -96,6 +98,7 @@ install -m 644 %_topdir/SOURCES/smartmet-data-models/gsm/gsm-pressure.cnf %{buil
 mkdir -p .%{smartmetroot}/run/data/icon/{bin,cnf}
 mkdir -p .%{smartmetroot}/run/data/icon/cnf/st.surface.d
 mkdir -p .%{smartmetroot}/data/incoming/icon
+mkdir -p .%{smartmetroot}/data/icon/europe/{surface,pressure}/querydata
 install -m 644 %_topdir/SOURCES/smartmet-data-models/icon/icon.cnf %{buildroot}%{smartmetroot}/cnf/data/
 install -m 644 %_topdir/SOURCES/smartmet-data-models/icon/icon.cron %{buildroot}%{smartmetroot}/cnf/cron/cron.d/
 install -m 755 %_topdir/SOURCES/smartmet-data-models/icon/clean_data_icon %{buildroot}%{smartmetroot}/cnf/cron/cron.hourly/
@@ -105,6 +108,7 @@ install -m 644 %_topdir/SOURCES/smartmet-data-models/icon/icon-pressure.cnf %{bu
 install -m 644 %_topdir/SOURCES/smartmet-data-models/icon/st.surface.d/rr1h-353.st %{buildroot}%{smartmetroot}/run/data/icon/cnf/st.surface.d/
 
 mkdir -p .%{smartmetroot}/run/data/ukmo/{bin,cnf}
+mkdir -p .%{smartmetroot}/data/ukmo/world/{surface,pressure}/querydata
 install -m 644 %_topdir/SOURCES/smartmet-data-models/ukmo/ukmo.cnf %{buildroot}%{smartmetroot}/cnf/data/
 install -m 644 %_topdir/SOURCES/smartmet-data-models/ukmo/ukmo.cron %{buildroot}%{smartmetroot}/cnf/cron/cron.d/
 install -m 755 %_topdir/SOURCES/smartmet-data-models/ukmo/clean_data_ukmo %{buildroot}%{smartmetroot}/cnf/cron/cron.hourly/
@@ -113,6 +117,7 @@ install -m 644 %_topdir/SOURCES/smartmet-data-models/ukmo/ukmo-pressure.cnf %{bu
 
 mkdir -p .%{smartmetroot}/run/data/wrf/{bin,cnf}
 mkdir -p .%{smartmetroot}/run/data/wrf/cnf/st.surface.d
+mkdir -p .%{smartmetroot}/data/wrf/{small,large}/{surface,pressure}/querydata
 install -m 644 %_topdir/SOURCES/smartmet-data-models/wrf/wrf-large.cnf %{buildroot}%{smartmetroot}/cnf/data/
 install -m 644 %_topdir/SOURCES/smartmet-data-models/wrf/wrf-small.cnf %{buildroot}%{smartmetroot}/cnf/data/
 install -m 644 %_topdir/SOURCES/smartmet-data-models/wrf/wrf.cron %{buildroot}%{smartmetroot}/cnf/cron/cron.d/
@@ -122,6 +127,7 @@ install -m 644 %_topdir/SOURCES/smartmet-data-models/wrf/wrf-pressure.cnf %{buil
 install -m 644 %_topdir/SOURCES/smartmet-data-models/wrf/st.surface.d/rr1h-353.st %{buildroot}%{smartmetroot}/run/data/wrf/cnf/st.surface.d/
 
 mkdir -p .%{smartmetroot}/run/data/arpege/{bin,cnf}
+mkdir -p .%{smartmetroot}/data/arpege/europe/{surface,pressure}/querydata
 install -m 644 %_topdir/SOURCES/smartmet-data-models/arpege/arpege.cnf %{buildroot}%{smartmetroot}/cnf/data/
 install -m 644 %_topdir/SOURCES/smartmet-data-models/arpege/arpege.cron %{buildroot}%{smartmetroot}/cnf/cron/cron.d/
 install -m 755 %_topdir/SOURCES/smartmet-data-models/arpege/clean_data_arpege %{buildroot}%{smartmetroot}/cnf/cron/cron.hourly/
@@ -139,6 +145,12 @@ install -m 644 %_topdir/SOURCES/smartmet-data-models/arpege/arpege-pressure.cnf 
 # ECMWF
 %files ecmwf
 %defattr(-,smartmet,smartmet,-)
+%dir %{smartmetroot}/data/ecmwf
+%dir %{smartmetroot}/data/ecmwf/world
+%dir %{smartmetroot}/data/ecmwf/world/surface
+%dir %{smartmetroot}/data/ecmwf/world/surface/querydata
+%dir %{smartmetroot}/data/ecmwf/world/pressure
+%dir %{smartmetroot}/data/ecmwf/world/pressure/querydata
 %dir %{smartmetroot}/run/data/ecmwf
 %dir %{smartmetroot}/run/data/ecmwf/bin
 %dir %{smartmetroot}/run/data/ecmwf/cnf
@@ -155,6 +167,12 @@ install -m 644 %_topdir/SOURCES/smartmet-data-models/arpege/arpege-pressure.cnf 
 # GSM
 %files gsm
 %defattr(-,smartmet,smartmet,-)
+%dir %{smartmetroot}/data/gsm
+%dir %{smartmetroot}/data/gsm/world
+%dir %{smartmetroot}/data/gsm/world/surface
+%dir %{smartmetroot}/data/gsm/world/surface/querydata
+%dir %{smartmetroot}/data/gsm/world/pressure
+%dir %{smartmetroot}/data/gsm/world/pressure/querydata
 %dir %{smartmetroot}/run/data/gsm
 %dir %{smartmetroot}/run/data/gsm/bin
 %dir %{smartmetroot}/run/data/gsm/cnf
@@ -167,6 +185,12 @@ install -m 644 %_topdir/SOURCES/smartmet-data-models/arpege/arpege-pressure.cnf 
 # ICON
 %files icon
 %defattr(-,smartmet,smartmet,-)
+%dir %{smartmetroot}/data/icon
+%dir %{smartmetroot}/data/icon/europe
+%dir %{smartmetroot}/data/icon/europe/surface
+%dir %{smartmetroot}/data/icon/europe/surface/querydata
+%dir %{smartmetroot}/data/icon/europe/pressure
+%dir %{smartmetroot}/data/icon/europe/pressure/querydata
 %dir %{smartmetroot}/data/incoming/icon
 %dir %{smartmetroot}/run/data/icon
 %dir %{smartmetroot}/run/data/icon/bin
@@ -183,6 +207,12 @@ install -m 644 %_topdir/SOURCES/smartmet-data-models/arpege/arpege-pressure.cnf 
 # UKMO
 %files ukmo
 %defattr(-,smartmet,smartmet,-)
+%dir %{smartmetroot}/data/ukmo
+%dir %{smartmetroot}/data/ukmo/world
+%dir %{smartmetroot}/data/ukmo/world/surface
+%dir %{smartmetroot}/data/ukmo/world/surface/querydata
+%dir %{smartmetroot}/data/ukmo/world/pressure
+%dir %{smartmetroot}/data/ukmo/world/pressure/querydata
 %dir %{smartmetroot}/run/data/ukmo
 %dir %{smartmetroot}/run/data/ukmo/bin
 %dir %{smartmetroot}/run/data/ukmo/cnf
@@ -195,6 +225,17 @@ install -m 644 %_topdir/SOURCES/smartmet-data-models/arpege/arpege-pressure.cnf 
 # WRF
 %files wrf
 %defattr(-,smartmet,smartmet,-)
+%dir %{smartmetroot}/data/wrf
+%dir %{smartmetroot}/data/wrf/small
+%dir %{smartmetroot}/data/wrf/small/surface
+%dir %{smartmetroot}/data/wrf/small/surface/querydata
+%dir %{smartmetroot}/data/wrf/small/pressure
+%dir %{smartmetroot}/data/wrf/small/pressure/querydata
+%dir %{smartmetroot}/data/wrf/large
+%dir %{smartmetroot}/data/wrf/large/surface
+%dir %{smartmetroot}/data/wrf/large/surface/querydata
+%dir %{smartmetroot}/data/wrf/large/pressure
+%dir %{smartmetroot}/data/wrf/large/pressure/querydata
 %dir %{smartmetroot}/run/data/wrf
 %dir %{smartmetroot}/run/data/wrf/bin
 %dir %{smartmetroot}/run/data/wrf/cnf
@@ -210,6 +251,12 @@ install -m 644 %_topdir/SOURCES/smartmet-data-models/arpege/arpege-pressure.cnf 
 # ARPEGE
 %files arpege
 %defattr(-,smartmet,smartmet,-)
+%dir %{smartmetroot}/data/arpege
+%dir %{smartmetroot}/data/arpege/europe
+%dir %{smartmetroot}/data/arpege/europe/surface
+%dir %{smartmetroot}/data/arpege/europe/surface/querydata
+%dir %{smartmetroot}/data/arpege/europe/pressure
+%dir %{smartmetroot}/data/arpege/europe/pressure/querydata
 %dir %{smartmetroot}/run/data/arpege
 %dir %{smartmetroot}/run/data/arpege/bin
 %dir %{smartmetroot}/run/data/arpege/cnf
