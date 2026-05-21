@@ -1,7 +1,7 @@
 %define smartmetroot /smartmet
 
 Name:           smartmet-data-models
-Version:        26.4.14
+Version:        26.5.22
 Release:        1%{?dist}.fmi
 Summary:        SmartMet Data Models Common
 Group:          System Environment/Base
@@ -113,6 +113,7 @@ install -m 644 %_topdir/SOURCES/smartmet-data-models/ukmo/ukmo-pressure.cnf %{bu
 
 mkdir -p .%{smartmetroot}/run/data/wrf/{bin,cnf}
 mkdir -p .%{smartmetroot}/run/data/wrf/cnf/st.surface.d
+mkdir -p .%{smartmetroot}/data/wrf/{small,large}/{surface,pressure}/querydata
 install -m 644 %_topdir/SOURCES/smartmet-data-models/wrf/wrf-large.cnf %{buildroot}%{smartmetroot}/cnf/data/
 install -m 644 %_topdir/SOURCES/smartmet-data-models/wrf/wrf-small.cnf %{buildroot}%{smartmetroot}/cnf/data/
 install -m 644 %_topdir/SOURCES/smartmet-data-models/wrf/wrf.cron %{buildroot}%{smartmetroot}/cnf/cron/cron.d/
@@ -195,6 +196,17 @@ install -m 644 %_topdir/SOURCES/smartmet-data-models/arpege/arpege-pressure.cnf 
 # WRF
 %files wrf
 %defattr(-,smartmet,smartmet,-)
+%dir %{smartmetroot}/data/wrf
+%dir %{smartmetroot}/data/wrf/small
+%dir %{smartmetroot}/data/wrf/small/surface
+%dir %{smartmetroot}/data/wrf/small/surface/querydata
+%dir %{smartmetroot}/data/wrf/small/pressure
+%dir %{smartmetroot}/data/wrf/small/pressure/querydata
+%dir %{smartmetroot}/data/wrf/large
+%dir %{smartmetroot}/data/wrf/large/surface
+%dir %{smartmetroot}/data/wrf/large/surface/querydata
+%dir %{smartmetroot}/data/wrf/large/pressure
+%dir %{smartmetroot}/data/wrf/large/pressure/querydata
 %dir %{smartmetroot}/run/data/wrf
 %dir %{smartmetroot}/run/data/wrf/bin
 %dir %{smartmetroot}/run/data/wrf/cnf
@@ -224,6 +236,16 @@ install -m 644 %_topdir/SOURCES/smartmet-data-models/arpege/arpege-pressure.cnf 
 rm -rf $RPM_BUILD_ROOT
 
 %changelog
+* Fri May 22 2026 Mikko Rauhala <mikko.rauhala@fmi.fi> 26.5.22-1%{?dist}.fmi
+- Fix completeness check to count endStep instead of startStep, so model
+  runs with accumulated fields are no longer re-converted every cycle
+- Add hybrid (model) level conversion block to ingest-model.sh
+- Add -l (level select) and -n (skip update.sh) options to ingest-model.sh
+- ingest-model.sh: create output dir up front, skip empty st.<level>.d
+  globs, return 0 from qdstepcount on a missing sqd, move the EXIT trap
+  before the work, quote TERM, drop leftover debug prints
+- Fix broken ARPEGE download URL (URL-encoded curly braces in PREFIX)
+- Package owns the WRF output querydata directories (fixed area names)
 * Fri Apr 14 2026 Mikael Hasu <mikael.hasu@fmi.fi> 26.4.14-1%{?dist}.fmi
 - Add st.surface.d and rr1h for icon and wrf
 * Fri Apr 10 2026 Mikael Hasu <mikael.hasu@fmi.fi> 26.4.10-1%{?dist}.fmi
