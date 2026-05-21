@@ -41,6 +41,7 @@ if [ $# -eq 0 ]; then
     printf "\t%s\t%s\n" "-a area" ""
     printf "\t%s\t%s\n" "-t yyyymmddThh" "reference time"
     printf "\t%s\t%s\n" "-i input" "input grib file (over rides reference time)"
+    printf "\t%s\t%s\n" "-p projection" "target projection"
     printf "\t%s\t\t%s\n" "-d" "debug, do not distribute"
     printf "\t%s\t\t%s\n" "-f" "force"
     exit 1
@@ -84,11 +85,11 @@ fi
 LOGFILE=$BASE/logs/data/${MODEL}_${AREA}_$(date -u +%H).log
 
 # Use log file if not run interactively
-if [ $TERM = "dumb" ]; then
+if [ "${TERM:-}" = "dumb" ]; then
     exec &> $LOGFILE
 fi
 
-CONVERT_OPTIONS="$CONVERT_OPTIONS ${CROP:+"-G $CROP"} ${PROJECTION:+"-P $PROJECTION"}"
+CONVERT_OPTIONS="${CONVERT_OPTIONS:-} ${CROP:+"-G $CROP"} ${PROJECTION:+"-P $PROJECTION"}"
 
 if [ -s $BASE/run/data/${MODEL}/bin/update.sh ]; then
     log INFO "Running $BASE/run/data/${MODEL}/bin/update.sh"
@@ -129,6 +130,7 @@ CNF=$BASE/run/data/$MODEL/cnf
 EDITOR=$BASE/editor/in
 TMP=$BASE/tmp/data/${MODEL}_${AREA}_${RT_DATE_HHMM}
 mkdir -p $TMP
+trap 'rm -rf "$TMP"; log INFO "Cleanup complete"' EXIT
 
 if [ -z "$IN" ]; then
     eval INFILE_SFC="$MODEL_RAW_ROOT$MODEL_RAW_DIR/$MODEL_RAW_SFC"
@@ -139,7 +141,6 @@ else
     INFILE_PL="$IN"
     INFILE_ML="$IN"
     RT=$(date -u +%s -d "$(grib_get -F %04d -p dataDate:i,dataTime:i $IN | sort -nu | tail -1 )")
-    echo "foo: $RT"
 fi
 
 OUTNAME=${RT_DATE_HHMM}_${MODEL}_${AREA}
@@ -313,6 +314,15 @@ if [ -z $FORCE ]; then
     else
 	    log INFO "$(basename "$OUTFILE_PL") is incomplete"
     fi
+
+    if [ -n "${MODEL_RAW_ML:-}" ]; then
+        if [ -s "$OUTFILE_ML" ] && [ $(eval gribstepcount "$INFILE_ML") -eq $(qdstepcount "$OUTFILE_ML") ]; then
+	        log INFO "$(basename "$OUTFILE_ML") is complete"
+	        MLDONE=1
+        else
+	        log INFO "$(basename "$OUTFILE_ML") is incomplete"
+        fi
+    fi
 else
     log INFO "Conversion forced from command line."
 fi
@@ -344,7 +354,6 @@ fi # surface
 #
 if [ -z $PLDONE ]; then
     TMPFILE_PL=$TMP/$(basename $OUTFILE_PL)
-    eval echo convert $MODEL $MODEL_ID "$MODEL_RAW_ROOT$MODEL_RAW_DIR/$MODEL_RAW_PL" $TMPFILE_PL
     eval convert $MODEL $MODEL_ID "$MODEL_RAW_ROOT$MODEL_RAW_DIR/$MODEL_RAW_PL" $TMPFILE_PL
     if [ -z $DEBUG ]; then
         distribute $TMPFILE_PL $OUTFILE_PL
@@ -352,7 +361,13 @@ if [ -z $PLDONE ]; then
 fi # pressure
 
 #
-# Clean
+# Hybrid (model) Levels
 #
-trap 'rm -rf "$TMP"; log INFO "Cleanup complete"' EXIT
+if [ -n "${MODEL_RAW_ML:-}" ] && [ -z $MLDONE ]; then
+    TMPFILE_ML=$TMP/$(basename $OUTFILE_ML)
+    eval convert $MODEL $MODEL_ID "$MODEL_RAW_ROOT$MODEL_RAW_DIR/$MODEL_RAW_ML" $TMPFILE_ML
+    if [ -z $DEBUG ]; then
+        distribute $TMPFILE_ML $OUTFILE_ML
+    fi # debug
+fi # hybrid
 
