@@ -137,16 +137,16 @@ if [ -z "$RT" ]; then
     fi
 fi
 
-RT_HOUR=`date -u -d@$RT +%H`
-RT_DATE_MMDD=`date -u -d@$RT +%Y%m%d`
-RT_DATE_MMDDHH=`date -u -d@$RT +%m%d%H`
-RT_DATE_DDHH=`date -u -d@$RT +%d%H00`
-RT_DATE_DDHHMM=`date -u -d@$RT +%d%H00`
-RT_DATE_HH=`date -u -d@$RT +%Y%m%d%H`
-RT_DATE_HHMM=`date -u -d@$RT +%Y%m%d%H%M`
-RT_YYMMDD_HHMM=`date -u -d@$RT +%y%m%d%H%M`
-RT_DATE_HHMMSS=`date -u -d@$RT +%Y%m%d%H%M%S`
-RT_ISO=`date -u -d@$RT +%Y-%m-%dT%H:%M:%SZ`
+RT_HOUR=$(date -u -d@$RT +%H)
+RT_DATE_MMDD=$(date -u -d@$RT +%Y%m%d)
+RT_DATE_MMDDHH=$(date -u -d@$RT +%m%d%H)
+RT_DATE_DDHH=$(date -u -d@$RT +%d%H00)
+RT_DATE_DDHHMM=$(date -u -d@$RT +%d%H00)
+RT_DATE_HH=$(date -u -d@$RT +%Y%m%d%H)
+RT_DATE_HHMM=$(date -u -d@$RT +%Y%m%d%H%M)
+RT_YYMMDD_HHMM=$(date -u -d@$RT +%y%m%d%H%M)
+RT_DATE_HHMMSS=$(date -u -d@$RT +%Y%m%d%H%M%S)
+RT_ISO=$(date -u -d@$RT +%Y-%m-%dT%H:%M:%SZ)
 
 OUT=$BASE/data/$MODEL/$AREA
 CNF=$BASE/run/data/$MODEL/cnf

@@ -10,10 +10,8 @@ URL:            https://github.com/fmidev/smartmet-data-models
 BuildRoot:      %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
 BuildArch:	noarch
 
-%{?el6:Requires: smartmet-qdconversion}
-%{?el7:Requires: smartmet-qdtools}
-%{?el6:Requires: grib_api}
-%{?el7:Requires: eccodes}
+Requires: smartmet-qdtools
+Requires: eccodes
 Requires: cdo
 Requires: curl
 Requires: lftp
@@ -21,49 +19,52 @@ Requires: pbzip2
 Requires: rsync
 
 %description
-SmartMet data ingest module common
+Common ingestion tooling (ingest-model.sh, grib2cnf) shared by the
+per-model SmartMet data subpackages; converts model GRIB files to
+SmartMet querydata. Install a model subpackage such as
+smartmet-data-models-ecmwf alongside this one.
 
 %package ecmwf
 Summary: SmartMet Data ECMWF
 Requires: smartmet-data-models
 
 %description ecmwf
-SmartMet data ingest module for ECMWF model
+SmartMet data ingestion for the ECMWF IFS model (dissemination or AWS open-data GRIB).
 
 %package gsm
 Summary: SmartMet Data GSM
 Requires: smartmet-data-models
 
 %description gsm
-SmartMet data ingest module for GSM model
+SmartMet data ingestion for the JMA GSM global model.
 
 %package icon
 Summary: SmartMet Data ICON
 Requires: smartmet-data-models
 
 %description icon
-SmartMet data ingest module for ICON models
+SmartMet data ingestion for the DWD ICON global model (ICON-EU is handled separately).
 
 %package ukmo
 Summary: SmartMet Data UKMO
 Requires: smartmet-data-models
 
 %description ukmo
-SmartMet data ingest module for UKMO model
+SmartMet data ingestion for the UK Met Office global model.
 
 %package wrf
 Summary: SmartMet Data WRF
 Requires: smartmet-data-models
 
 %description wrf
-SmartMet data ingest module for WRF model
+SmartMet data ingestion for the WRF model (small and large domains).
 
 %package arpege
 Summary: SmartMet Data ARPEGE
 Requires: smartmet-data-models
 
 %description arpege
-SmartMet data ingest module for ARPEGE model
+SmartMet data ingestion for the Météo-France ARPEGE global model.
 
 %install
 rm -rf $RPM_BUILD_ROOT
