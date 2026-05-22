@@ -56,7 +56,7 @@ do
 	a) AREA=$OPTARG;;
 	m) MODEL=$OPTARG;;
 	p) PROJECTION=$OPTARG;;
-	t) RT=$(date +%s -d "$OPTARG");;
+	t) RT=$(date -u +%s -d "$OPTARG");;
     i) IN=$OPTARG;;
     l)
         IFS=',' read -ra _levels <<< "$OPTARG"
@@ -129,12 +129,19 @@ latest() {
 
 
 # Model Reference Time
-if [ -z "$RT" ]; then
+# -i overrides everything (read RT from the input file); else use -t if given,
+# else find the latest available model run in the incoming directory. This must
+# run before the RT_DATE_* derivations below, and the -i branch must not depend
+# on the incoming directory being populated.
+if [ -n "$IN" ]; then
+    RT=$(date -u +%s -d "$(grib_get -F %04d -p dataDate:i,dataTime:i $IN | sort -nu | tail -1 )")
+elif [ -z "$RT" ]; then
     RT=$(eval latest $MODEL_RAW_ROOT $MODEL_RAW_MASK)
-    if [ -z "$RT" ]; then
-        log ERROR "No data available in $MODEL_RAW_ROOT"
-        exit 1
-    fi
+fi
+
+if [ -z "$RT" ]; then
+    log ERROR "No reference time: -i file unreadable or no data in $MODEL_RAW_ROOT"
+    exit 1
 fi
 
 RT_HOUR=$(date -u -d@$RT +%H)
@@ -163,7 +170,6 @@ else
     INFILE_SFC="$IN"
     INFILE_PL="$IN"
     INFILE_ML="$IN"
-    RT=$(date -u +%s -d "$(grib_get -F %04d -p dataDate:i,dataTime:i $IN | sort -nu | tail -1 )")
 fi
 
 OUTNAME=${RT_DATE_HHMM}_${MODEL}_${AREA}
@@ -331,26 +337,30 @@ log INFO "Output hybrid level file: $(basename $OUTFILE_ML)"
 echo ""
 
 if [ -z $FORCE ]; then
-    if [ -s "$OUTFILE_SFC" ] && [ $(gribstepcount "$INFILE_SFC") -eq $(qdstepcount "$OUTFILE_SFC") ]; then
-	    log INFO "$(basename "$OUTFILE_SFC") is complete"
-	    SFCDONE=1
-    else
-	    log INFO "$(basename $OUTFILE_SFC) is incomplete"
+    if [ -n "${MODEL_RAW_SFC:-}" ]; then
+        if [ -s "$OUTFILE_SFC" ] && [ $(gribstepcount "$INFILE_SFC") -eq $(qdstepcount "$OUTFILE_SFC") ]; then
+            log INFO "$(basename "$OUTFILE_SFC") is complete"
+            SFCDONE=1
+        else
+            log INFO "$(basename "$OUTFILE_SFC") is incomplete"
+        fi
     fi
 
-    if [ -s "$OUTFILE_PL" ] && [ $(eval gribstepcount "$INFILE_PL") -eq $(qdstepcount "$OUTFILE_PL") ]; then
-	    log INFO "$(basename "$OUTFILE_PL") is complete"
-	    PLDONE=1
-    else
-	    log INFO "$(basename "$OUTFILE_PL") is incomplete"
+    if [ -n "${MODEL_RAW_PL:-}" ]; then
+        if [ -s "$OUTFILE_PL" ] && [ $(gribstepcount "$INFILE_PL") -eq $(qdstepcount "$OUTFILE_PL") ]; then
+            log INFO "$(basename "$OUTFILE_PL") is complete"
+            PLDONE=1
+        else
+            log INFO "$(basename "$OUTFILE_PL") is incomplete"
+        fi
     fi
 
     if [ -n "${MODEL_RAW_ML:-}" ]; then
-        if [ -s "$OUTFILE_ML" ] && [ $(eval gribstepcount "$INFILE_ML") -eq $(qdstepcount "$OUTFILE_ML") ]; then
-	        log INFO "$(basename "$OUTFILE_ML") is complete"
-	        MLDONE=1
+        if [ -s "$OUTFILE_ML" ] && [ $(gribstepcount "$INFILE_ML") -eq $(qdstepcount "$OUTFILE_ML") ]; then
+            log INFO "$(basename "$OUTFILE_ML") is complete"
+            MLDONE=1
         else
-	        log INFO "$(basename "$OUTFILE_ML") is incomplete"
+            log INFO "$(basename "$OUTFILE_ML") is incomplete"
         fi
     fi
 else
@@ -360,7 +370,7 @@ fi
 #
 # Surface Data
 #
-if [ -n "${RUN_SFC:-}" ] && [ -z $SFCDONE ]; then
+if [ -n "${RUN_SFC:-}" ] && [ -n "${MODEL_RAW_SFC:-}" ] && [ -z $SFCDONE ]; then
     mkdir -p "$(dirname "$OUTFILE_SFC")"
     TMPFILE_SFC=$TMP/$(basename $OUTFILE_SFC)
 
@@ -383,7 +393,7 @@ fi # surface
 #
 # Pressure Levels
 #
-if [ -n "${RUN_PL:-}" ] && [ -z $PLDONE ]; then
+if [ -n "${RUN_PL:-}" ] && [ -n "${MODEL_RAW_PL:-}" ] && [ -z $PLDONE ]; then
     mkdir -p "$(dirname "$OUTFILE_PL")"
     TMPFILE_PL=$TMP/$(basename $OUTFILE_PL)
     eval convert $MODEL $MODEL_ID "$MODEL_RAW_ROOT$MODEL_RAW_DIR/$MODEL_RAW_PL" $TMPFILE_PL
