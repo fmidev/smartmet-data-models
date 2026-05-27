@@ -1,19 +1,41 @@
 MODEL=ecmwf
 MODEL_ID=240
+
+# Default world modify crop to match a smaller domain if needed.
+AREA=world
+
+# To crop are to a smaller domain example Bhutan area.
+#CROP=LEFT,BOTTOM,RIGHT,TOP
+#CROP=61,7,103,40
+
+# ---------------------------------------------------------------------------
+# DATA SOURCE — uncomment one block and the matching UPDATE_SCRIPT line
+# ---------------------------------------------------------------------------
+
+# Local ECMWF dissemination (files arrive via other means, no update script)
 MODEL_RAW_ROOT='/smartmet/data/incoming/ecmwf'
 MODEL_RAW_DIR='/$RT_DATE_HHMMSS'
 MODEL_RAW_SFC='\*.bin'
 MODEL_RAW_PL='\*hPa\*.bin'
-
 MODEL_RAW_MASK='\*.bin'
-
-AREA=world
-
-# Update script run before ingestion. Basename resolves under
-# /smartmet/run/data/ecmwf/bin/; absolute paths are used as-is. Leave unset
-# for local ECMWF dissemination (incoming files appear in $MODEL_RAW_ROOT
-# by other means). For ECMWF open data, also adjust MODEL_RAW_* above to
-# match the downloader's filenames and pick one of:
-#   UPDATE_SCRIPT=update.sh           # aws-cli sync from s3://ecmwf-forecasts
-#   UPDATE_SCRIPT=update-opendata.sh  # python ecmwf-opendata client (parallel)
 #UPDATE_SCRIPT=
+
+# ECMWF open data via AWS CLI (s3://ecmwf-forecasts)
+# Requires: awscli
+#MODEL_RAW_ROOT='/smartmet/data/incoming/ecmwf'
+#MODEL_RAW_DIR=''
+#MODEL_RAW_SFC='\*ifs_sfc\*${RT_DATE_MMDD}${RT_HOUR}\*.grib2'
+#MODEL_RAW_PL='\*ifs_pl\*${RT_DATE_MMDD}${RT_HOUR}\*.grib2'
+#MODEL_RAW_MASK='\*.grib2'
+#UPDATE_SCRIPT=update-opendata-awscli.sh
+
+# ECMWF open data via Python ecmwf-opendata client (parallel download)
+# Requires: pip3 install --user ecmwf-opendata (as smartmet user)
+#MODEL_RAW_ROOT='/smartmet/data/incoming/ecmwf'
+#MODEL_RAW_DIR=''
+#MODEL_RAW_SFC='\*ifs_sfc\*${RT_DATE_MMDD}${RT_HOUR}\*.grib2'
+#MODEL_RAW_PL='\*ifs_pl\*${RT_DATE_MMDD}${RT_HOUR}\*.grib2'
+#MODEL_RAW_MASK='\*.grib2'
+#UPDATE_SCRIPT=update-opendata-python.sh
+
+# ---------------------------------------------------------------------------
