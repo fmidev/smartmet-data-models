@@ -8,3 +8,12 @@ MODEL_RAW_PL='\*hPa\*.bin'
 MODEL_RAW_MASK='\*.bin'
 
 AREA=world
+
+# Update script run before ingestion. Basename resolves under
+# /smartmet/run/data/ecmwf/bin/; absolute paths are used as-is. Leave unset
+# for local ECMWF dissemination (incoming files appear in $MODEL_RAW_ROOT
+# by other means). For ECMWF open data, also adjust MODEL_RAW_* above to
+# match the downloader's filenames and pick one of:
+#   UPDATE_SCRIPT=update.sh           # aws-cli sync from s3://ecmwf-forecasts
+#   UPDATE_SCRIPT=update-opendata.sh  # python ecmwf-opendata client (parallel)
+#UPDATE_SCRIPT=
