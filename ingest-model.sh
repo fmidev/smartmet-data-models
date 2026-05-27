@@ -114,9 +114,24 @@ CONVERT_OPTIONS="${CONVERT_OPTIONS:-} ${CROP:+"-G $CROP"} ${PROJECTION:+"-P $PRO
 
 if [ -n "${NO_UPDATE:-}" ]; then
     log INFO "Skipping update.sh (-n)"
-elif [ -s $BASE/run/data/${MODEL}/bin/update.sh ]; then
-    log INFO "Running $BASE/run/data/${MODEL}/bin/update.sh"
-    $BASE/run/data/${MODEL}/bin/update.sh
+else
+    # UPDATE_SCRIPT from the model cnf overrides the default. Accepts a
+    # basename relative to $BASE/run/data/<model>/bin/ or an absolute path.
+    # Leave unset to fall back to the conventional update.sh (or skip when
+    # neither is present, e.g. local dissemination drops files directly).
+    if [ -n "${UPDATE_SCRIPT:-}" ]; then
+        case "$UPDATE_SCRIPT" in
+            /*) UPDATE_PATH="$UPDATE_SCRIPT" ;;
+            *)  UPDATE_PATH="$BASE/run/data/${MODEL}/bin/${UPDATE_SCRIPT}" ;;
+        esac
+    else
+        UPDATE_PATH="$BASE/run/data/${MODEL}/bin/update.sh"
+    fi
+
+    if [ -s "$UPDATE_PATH" ]; then
+        log INFO "Running $UPDATE_PATH"
+        "$UPDATE_PATH"
+    fi
 fi
 
 latest() {

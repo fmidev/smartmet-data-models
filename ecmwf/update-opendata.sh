@@ -5,7 +5,7 @@ INCOMING=/smartmet/data/incoming/ecmwf
 export INCOMING
 
 PYTHON=/usr/bin/python3
-DL=/smartmet/bin/ecmwf-opendata.py
+DL="$(dirname "$(readlink -f "$0")")/ecmwf-opendata.py"
 
 STEPS="0:144:3,150:240:6"
 JOBS=4

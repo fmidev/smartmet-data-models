@@ -1,7 +1,7 @@
 %define smartmetroot /smartmet
 
 Name:           smartmet-data-models
-Version:        26.5.22
+Version:        26.5.23
 Release:        1%{?dist}.fmi
 Summary:        SmartMet Data Models Common
 Group:          System Environment/Base
@@ -27,6 +27,8 @@ smartmet-data-models-ecmwf alongside this one.
 %package ecmwf
 Summary: SmartMet Data ECMWF
 Requires: smartmet-data-models
+Requires: python3
+Requires: parallel
 
 %description ecmwf
 SmartMet data ingestion for the ECMWF IFS model (dissemination or AWS open-data GRIB).
@@ -86,6 +88,9 @@ install -m 644 %_topdir/SOURCES/smartmet-data-models/ecmwf/ecmwf.cnf %{buildroot
 install -m 644 %_topdir/SOURCES/smartmet-data-models/ecmwf/ecmwf.cron %{buildroot}%{smartmetroot}/cnf/cron/cron.d/
 install -m 755 %_topdir/SOURCES/smartmet-data-models/ecmwf/clean_data_ecmwf %{buildroot}%{smartmetroot}/cnf/cron/cron.hourly/
 install -m 644 %_topdir/SOURCES/smartmet-data-models/ecmwf/ecmwf-{surface,pressure}.{cnf,st} %{buildroot}%{smartmetroot}/run/data/ecmwf/cnf/
+install -m 755 %_topdir/SOURCES/smartmet-data-models/ecmwf/update.sh %{buildroot}%{smartmetroot}/run/data/ecmwf/bin/
+install -m 755 %_topdir/SOURCES/smartmet-data-models/ecmwf/update-opendata.sh %{buildroot}%{smartmetroot}/run/data/ecmwf/bin/
+install -m 755 %_topdir/SOURCES/smartmet-data-models/ecmwf/ecmwf-opendata.py %{buildroot}%{smartmetroot}/run/data/ecmwf/bin/
 
 mkdir -p .%{smartmetroot}/run/data/gsm/{bin,cnf}
 install -m 644 %_topdir/SOURCES/smartmet-data-models/gsm/gsm.cnf %{buildroot}%{smartmetroot}/cnf/data/
@@ -153,6 +158,9 @@ install -m 644 %_topdir/SOURCES/smartmet-data-models/arpege/arpege-pressure.cnf 
 %config(noreplace) %{smartmetroot}/run/data/ecmwf/cnf/ecmwf-pressure.cnf
 %config(noreplace) %{smartmetroot}/run/data/ecmwf/cnf/ecmwf-surface.st
 %config(noreplace) %{smartmetroot}/run/data/ecmwf/cnf/ecmwf-pressure.st
+%attr(0755,smartmet,smartmet) %{smartmetroot}/run/data/ecmwf/bin/update.sh
+%attr(0755,smartmet,smartmet) %{smartmetroot}/run/data/ecmwf/bin/update-opendata.sh
+%attr(0755,smartmet,smartmet) %{smartmetroot}/run/data/ecmwf/bin/ecmwf-opendata.py
 
 # GSM
 %files gsm
@@ -237,6 +245,15 @@ install -m 644 %_topdir/SOURCES/smartmet-data-models/arpege/arpege-pressure.cnf 
 rm -rf $RPM_BUILD_ROOT
 
 %changelog
+* Sat May 23 2026 Elmeri Nurmi <elmeri.nurmi@fmi.fi> 26.5.23-1%{?dist}.fmi
+- ingest-model.sh: pick update script via UPDATE_SCRIPT in the model cnf
+  (basename under run/data/<model>/bin/ or absolute path); falls back to
+  update.sh and skips silently when neither is present
+- Ship ECMWF update.sh, update-opendata.sh, and ecmwf-opendata.py under
+  /smartmet/run/data/ecmwf/bin/; update-opendata.sh now resolves the
+  python helper relative to its own location
+- Require python3 and parallel for the ECMWF subpackage so the opendata
+  downloader works out of the box
 * Fri May 22 2026 Mikko Rauhala <mikko.rauhala@fmi.fi> 26.5.22-1%{?dist}.fmi
 - Fix completeness check to count endStep instead of startStep, so model
   runs with accumulated fields are no longer re-converted every cycle
