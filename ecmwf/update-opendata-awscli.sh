@@ -22,13 +22,5 @@ INCOMING_TMP=/smartmet/data/incoming/ecmwf/$RT_DATE/$RT_HOUR
 
 mkdir -p ${INCOMING_TMP}
 
-# Different MODEL_TYPE for 06/18z
-if [ $RT_HOUR -eq 06 ] || [ $RT_HOUR -eq 18 ]
- then
-  MODEL_TYPE=scda
- else
-  MODEL_TYPE=oper
-fi
-
 # Use sync command to download data from s3 bucket
 time aws s3 sync --exclude "*" --include "*grib2" --no-sign-request s3://ecmwf-forecasts/${RT_DATE}/${RT_HOUR}z/${MODEL_PRODUCER}/${MODEL_VERSION}/${MODEL_TYPE}/ ${INCOMING_TMP}/
