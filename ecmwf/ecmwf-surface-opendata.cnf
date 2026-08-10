@@ -1,0 +1,44 @@
+#
+# Grib to QD Conversion Tables for Centre ECMF
+#
+#
+# ECMWF Parameter Database
+# https://codes.ecmwf.int/grib/param-db/
+#
+# List of available SmartMetIDs
+# qdinfo -l
+
+# GribID;SmartMetID;Name;Base;Scale;LevelType;LevelValue;InterpolationMethod
+
+# 1: Mean Sea Level Pressure [Pa]
+151;1;Mean Sea Level Pressure (msl);0;0.01;102;0
+
+# 2: Geopotential [m**2 s**-2]
+129;2;Geopotential (z);0;1
+
+# 4: 2 Metre Temperature [K]
+167;4;2 Metre Temperature (2t);-273.15;1;105;2
+
+# 10: 2 Metre Dewpoint Temperature [K]
+168;10;2 Metre Dewpoint Temperature (2d);-273.15;1;105;2
+
+# 23: 10 Metre U Wind Component [m s**-1]
+165;23;10 Metre U Wind Component (10u);0;1;105;10
+
+# 24: 10 Metre V Wind Component [m s**-1]
+166;24;10 Metre V Wind Component (10v);0;1;105;10
+
+# 50: Total Precipitation [m]
+228;50;Total Precipitation (tp);0;1000;1;0
+
+# 59: Most-unstable CAPE [J kg**-1]
+228235;59;Most-unstable CAPE (mucape);0;1;17;0
+
+# 79: Total Cloud Cover [(0 - 1)]
+164;79;Total Cloud Cover (tcc);0;1;10;0
+
+# 51: Snow Depth [m of water equivalent]
+141;51;Snow Depth (sd);0;1
+
+# 56: Precipitation Type [(Code table 4.201)]
+260015;56;Precipitation Type (ptype);0;1
