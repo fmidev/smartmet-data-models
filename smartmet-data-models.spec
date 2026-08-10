@@ -1,7 +1,7 @@
 %define smartmetroot /smartmet
 
 Name:           smartmet-data-models
-Version:        26.5.27
+Version:        26.8.10
 Release:        1%{?dist}.fmi
 Summary:        SmartMet Data Models Common
 Group:          System Environment/Base
@@ -89,6 +89,7 @@ install -m 644 %_topdir/SOURCES/smartmet-data-models/ecmwf/ecmwf.cnf %{buildroot
 install -m 644 %_topdir/SOURCES/smartmet-data-models/ecmwf/ecmwf.cron %{buildroot}%{smartmetroot}/cnf/cron/cron.d/
 install -m 755 %_topdir/SOURCES/smartmet-data-models/ecmwf/clean_data_ecmwf %{buildroot}%{smartmetroot}/cnf/cron/cron.hourly/
 install -m 644 %_topdir/SOURCES/smartmet-data-models/ecmwf/ecmwf-{surface,pressure}.{cnf,st} %{buildroot}%{smartmetroot}/run/data/ecmwf/cnf/
+install -m 644 %_topdir/SOURCES/smartmet-data-models/ecmwf/ecmwf-{surface,pressure}-opendata.cnf %{buildroot}%{smartmetroot}/run/data/ecmwf/cnf/
 install -m 755 %_topdir/SOURCES/smartmet-data-models/ecmwf/update-opendata-awscli.sh %{buildroot}%{smartmetroot}/run/data/ecmwf/bin/
 install -m 755 %_topdir/SOURCES/smartmet-data-models/ecmwf/update-opendata-python.sh %{buildroot}%{smartmetroot}/run/data/ecmwf/bin/
 install -m 755 %_topdir/SOURCES/smartmet-data-models/ecmwf/ecmwf-opendata.py %{buildroot}%{smartmetroot}/run/data/ecmwf/bin/
@@ -157,6 +158,8 @@ install -m 644 %_topdir/SOURCES/smartmet-data-models/arpege/arpege-pressure.cnf 
 %config(noreplace) %attr(0755,smartmet,smartmet) %{smartmetroot}/cnf/cron/cron.hourly/clean_data_ecmwf
 %config(noreplace) %{smartmetroot}/run/data/ecmwf/cnf/ecmwf-surface.cnf
 %config(noreplace) %{smartmetroot}/run/data/ecmwf/cnf/ecmwf-pressure.cnf
+%config(noreplace) %{smartmetroot}/run/data/ecmwf/cnf/ecmwf-surface-opendata.cnf
+%config(noreplace) %{smartmetroot}/run/data/ecmwf/cnf/ecmwf-pressure-opendata.cnf
 %config(noreplace) %{smartmetroot}/run/data/ecmwf/cnf/ecmwf-surface.st
 %config(noreplace) %{smartmetroot}/run/data/ecmwf/cnf/ecmwf-pressure.st
 %attr(0755,smartmet,smartmet) %{smartmetroot}/run/data/ecmwf/bin/update-opendata-awscli.sh
@@ -246,6 +249,12 @@ install -m 644 %_topdir/SOURCES/smartmet-data-models/arpege/arpege-pressure.cnf 
 rm -rf $RPM_BUILD_ROOT
 
 %changelog
+* Mon Aug 10 2026 Elmeri Nurmi <elmeri.nurmi@fmi.fi> 26.8.10-1%{?dist}.fmi
+- Ship ECMWF open-data parameter tables ecmwf-surface-opendata.cnf and
+  ecmwf-pressure-opendata.cnf under /smartmet/run/data/ecmwf/cnf/; rename
+  the wanted variant over ecmwf-<level>.cnf to activate it, since
+  ingest-model.sh reads ecmwf-<level>.cnf by name
+
 * Wed May 27 2026 Elmeri Nurmi <elmeri.nurmi@fmi.fi> 26.5.27-1%{?dist}.fmi
 - Rename update.sh to update-opendata-awscli.sh and update-opendata.sh to
   update-opendata-python.sh for clarity
