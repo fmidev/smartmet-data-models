@@ -1,7 +1,7 @@
 %define smartmetroot /smartmet
 
 Name:           smartmet-data-models
-Version:        26.8.10
+Version:        26.9.25
 Release:        1%{?dist}.fmi
 Summary:        SmartMet Data Models Common
 Group:          System Environment/Base
@@ -249,6 +249,10 @@ install -m 644 %_topdir/SOURCES/smartmet-data-models/arpege/arpege-pressure.cnf 
 rm -rf $RPM_BUILD_ROOT
 
 %changelog
+* Fri Sep 25 2026 Elmeri Nurmi <elmeri.nurmi@fmi.fi> 26.9.25-1%{?dist}.fmi
+- ingest-model.sh: run st.<level>.d qdscript post-processing for pressure
+  and hybrid levels, not only surface
+
 * Mon Aug 10 2026 Elmeri Nurmi <elmeri.nurmi@fmi.fi> 26.8.10-1%{?dist}.fmi
 - Ship ECMWF open-data parameter tables ecmwf-surface-opendata.cnf and
   ecmwf-pressure-opendata.cnf under /smartmet/run/data/ecmwf/cnf/; rename
