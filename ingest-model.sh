@@ -402,6 +402,7 @@ if [ -n "${RUN_PL:-}" ] && [ -z $PLDONE ]; then
     mkdir -p "$(dirname "$OUTFILE_PL")"
     TMPFILE_PL=$TMP/$(basename $OUTFILE_PL)
     eval convert $MODEL $MODEL_ID "$MODEL_RAW_ROOT$MODEL_RAW_DIR/$MODEL_RAW_PL" $TMPFILE_PL
+    process $TMPFILE_PL pressure
     if [ -z $DEBUG ]; then
         distribute $TMPFILE_PL $OUTFILE_PL
     fi # debug
@@ -414,6 +415,7 @@ if [ -n "${RUN_ML:-}" ] && [ -n "${MODEL_RAW_ML:-}" ] && [ -z $MLDONE ]; then
     mkdir -p "$(dirname "$OUTFILE_ML")"
     TMPFILE_ML=$TMP/$(basename $OUTFILE_ML)
     eval convert $MODEL $MODEL_ID "$MODEL_RAW_ROOT$MODEL_RAW_DIR/$MODEL_RAW_ML" $TMPFILE_ML
+    process $TMPFILE_ML hybrid
     if [ -z $DEBUG ]; then
         distribute $TMPFILE_ML $OUTFILE_ML
     fi # debug
