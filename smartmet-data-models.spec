@@ -258,6 +258,11 @@ rm -rf $RPM_BUILD_ROOT
   resolution (0p1/0p25), cycles, steps, surface/pressure parameters and
   pressure levels; AWS preferred with delayed fallback to data.ecmwf.int;
   cycles are published to the incoming directory only when complete
+- update-opendata.sh: when a step keeps failing on a source (e.g. S3
+  throttling) for OPENDATA_FALLBACK_DELAY minutes, use the next source;
+  stop a step at its first failed range; OPENDATA_MAX_RUNTIME limits how
+  long one run keeps starting new steps
+- ecmwf.cnf: Finland as the CROP example
 - Add OPENDATA_* settings block to ecmwf.cnf
 - Require jq for the ECMWF subpackage
 
