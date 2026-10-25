@@ -338,6 +338,21 @@ if ! flock -n 9; then
     exit 0
 fi
 
+# State of cycles older than the given one is no longer needed: either
+# complete (only the newest marker matters) or replaced by a newer cycle
+# before completing (staged files, partial downloads)
+cleanup_older() {
+    local d c
+    [ "$DRYRUN" = 0 ] || return 0
+    for d in "$STATE"/20*/; do
+        d=${d%/}
+        c=$(basename "$d")
+        [[ $c =~ ^[0-9]{10}$ ]] && [ "$c" -lt "$1" ] || continue
+        log "Removing state of older cycle $c ($(du -sh "$d" | cut -f1))"
+        rm -rf "$d"
+    done
+}
+
 # Candidate cycles, newest first
 CANDIDATES=()
 if [ -n "$FORCE_RT" ]; then
@@ -356,6 +371,7 @@ declare -A AVAIL=()
 for rt in "${CANDIDATES[@]}"; do
     if [ -e "$STATE/$rt/complete" ]; then
         log "Cycle $rt ($OPENDATA_RESOL) already complete, nothing to do"
+        cleanup_older "$rt"
         exit 0
     fi
     mapfile -t steps < <(cycle_steps "$rt")
@@ -379,6 +395,7 @@ fi
 
 WORK=$STATE/$RT
 mkdir -p "$WORK"
+cleanup_older "$RT"
 mapfile -t STEPS < <(cycle_steps "$RT")
 log "Cycle $RT, resolution $OPENDATA_RESOL, ${#STEPS[@]} steps, sources: $OPENDATA_SOURCES"
 
@@ -456,6 +473,8 @@ if [ ${#JOBS[@]} -gt 0 ]; then
         if ! fetch_step "$1" "$2"; then
             fail=$WORK/fail_$(printf "%03d" "$1")_$3
             [ "$DRYRUN" = 1 ] || [ -e "$fail" ] || touch "$fail"
+            # The next attempt starts the step from scratch
+            rm -rf "$WORK/tmp_$(printf "%03d" "$1")"
             echo "FAIL $1"
         fi' _ > "$WORK/jobs.out" || true
     grep -v '^DRYRUN \|^SKIP \|^FAIL ' "$WORK/jobs.out" || true
@@ -491,5 +510,6 @@ for f in "$WORK"/*.grib2.pending; do
     [ -e "$f" ] || continue
     mv -f "$f" "$INCOMING/$(basename "${f%.pending}")"
 done
+rm -rf "$WORK"/tmp_* "$WORK"/done_* "$WORK"/fail_* "$WORK"/seen_* "$WORK/missing"
 touch "$WORK/complete"
 log "Cycle $RT complete, files in $INCOMING"

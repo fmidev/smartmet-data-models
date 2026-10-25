@@ -2,7 +2,7 @@
 
 Name:           smartmet-data-models
 Version:        26.10.25
-Release:        2%{?dist}.fmi
+Release:        3%{?dist}.fmi
 Summary:        SmartMet Data Models Common
 Group:          System Environment/Base
 License:        MIT
@@ -252,6 +252,14 @@ install -m 644 %_topdir/SOURCES/smartmet-data-models/arpege/arpege-pressure.cnf 
 rm -rf $RPM_BUILD_ROOT
 
 %changelog
+* Sun Oct 25 2026 Elmeri Nurmi <elmeri.nurmi@fmi.fi> 26.10.25-3%{?dist}.fmi
+- update-opendata.sh: remove state of older cycles from
+  incoming/.opendata (staged files of cycles replaced by a newer one
+  before completing, markers of completed ones); drop partial downloads
+  of a failed step at once; keep only the complete marker of a
+  published cycle
+- ecmwf.cnf: document OPENDATA_RETRIES
+
 * Sun Oct 25 2026 Elmeri Nurmi <elmeri.nurmi@fmi.fi> 26.10.25-2%{?dist}.fmi
 - update-opendata.sh: when a step keeps failing on a source (e.g. S3
   throttling) for OPENDATA_FALLBACK_DELAY minutes, use the next source;
