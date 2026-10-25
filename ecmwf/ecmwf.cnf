@@ -20,6 +20,27 @@ MODEL_RAW_PL='\*hPa\*.bin'
 MODEL_RAW_MASK='\*.bin'
 #UPDATE_SCRIPT=
 
+# ECMWF open data via curl + jq (byte-range download of selected fields only).
+# Sources are tried in order; AWS is preferred, data.ecmwf.int is used only
+# when it has had the cycle for OPENDATA_FALLBACK_DELAY minutes and AWS not.
+# Domain cropping is done at querydata conversion with CROP above.
+# Requires: curl, jq
+#MODEL_RAW_ROOT='/smartmet/data/incoming/ecmwf'
+#MODEL_RAW_DIR=''
+#MODEL_RAW_SFC='\*ifs_sfc\*${RT_DATE_MMDD}${RT_HOUR}\*.grib2'
+#MODEL_RAW_PL='\*ifs_pl\*${RT_DATE_MMDD}${RT_HOUR}\*.grib2'
+#MODEL_RAW_MASK='\*.grib2'
+#UPDATE_SCRIPT=update-opendata.sh
+#OPENDATA_SOURCES="aws ecmwf"          # aws, ecmwf or a mirror URL
+#OPENDATA_RESOL=0p25                   # 0p1 or 0p25
+#OPENDATA_CYCLES="00 06 12 18"         # 06/18 runs go to +144 h
+#OPENDATA_STEPS="0:144:3,150:240:6"    # start:end:increment or list
+#OPENDATA_SFC_PARAMS="2t,2d,msl,10u,10v,tp,tcc,mucape,ptype,sd,z"  # empty = no surface
+#OPENDATA_PL_PARAMS="gh,t,r,u,v,w"     # empty = no pressure levels
+#OPENDATA_PL_LEVELS="1000,925,850,700,600,500,400,300,250,200,150,100,50"
+#OPENDATA_JOBS=4                       # steps downloaded in parallel
+#OPENDATA_FALLBACK_DELAY=60            # minutes before using a later source
+
 # ECMWF open data via AWS CLI (s3://ecmwf-forecasts)
 # Requires: awscli
 #MODEL_RAW_ROOT='/smartmet/data/incoming/ecmwf'

@@ -1,7 +1,7 @@
 %define smartmetroot /smartmet
 
 Name:           smartmet-data-models
-Version:        26.9.25
+Version:        26.10.25
 Release:        1%{?dist}.fmi
 Summary:        SmartMet Data Models Common
 Group:          System Environment/Base
@@ -30,6 +30,7 @@ Requires: smartmet-data-models
 Requires: python3
 Requires: parallel
 Requires: awscli
+Requires: jq
 
 %description ecmwf
 SmartMet data ingestion for the ECMWF IFS model (dissemination or AWS open-data GRIB).
@@ -90,6 +91,7 @@ install -m 644 %_topdir/SOURCES/smartmet-data-models/ecmwf/ecmwf.cron %{buildroo
 install -m 755 %_topdir/SOURCES/smartmet-data-models/ecmwf/clean_data_ecmwf %{buildroot}%{smartmetroot}/cnf/cron/cron.hourly/
 install -m 644 %_topdir/SOURCES/smartmet-data-models/ecmwf/ecmwf-{surface,pressure}.{cnf,st} %{buildroot}%{smartmetroot}/run/data/ecmwf/cnf/
 install -m 644 %_topdir/SOURCES/smartmet-data-models/ecmwf/ecmwf-{surface,pressure}-opendata.cnf %{buildroot}%{smartmetroot}/run/data/ecmwf/cnf/
+install -m 755 %_topdir/SOURCES/smartmet-data-models/ecmwf/update-opendata.sh %{buildroot}%{smartmetroot}/run/data/ecmwf/bin/
 install -m 755 %_topdir/SOURCES/smartmet-data-models/ecmwf/update-opendata-awscli.sh %{buildroot}%{smartmetroot}/run/data/ecmwf/bin/
 install -m 755 %_topdir/SOURCES/smartmet-data-models/ecmwf/update-opendata-python.sh %{buildroot}%{smartmetroot}/run/data/ecmwf/bin/
 install -m 755 %_topdir/SOURCES/smartmet-data-models/ecmwf/ecmwf-opendata.py %{buildroot}%{smartmetroot}/run/data/ecmwf/bin/
@@ -162,6 +164,7 @@ install -m 644 %_topdir/SOURCES/smartmet-data-models/arpege/arpege-pressure.cnf 
 %config(noreplace) %{smartmetroot}/run/data/ecmwf/cnf/ecmwf-pressure-opendata.cnf
 %config(noreplace) %{smartmetroot}/run/data/ecmwf/cnf/ecmwf-surface.st
 %config(noreplace) %{smartmetroot}/run/data/ecmwf/cnf/ecmwf-pressure.st
+%attr(0755,smartmet,smartmet) %{smartmetroot}/run/data/ecmwf/bin/update-opendata.sh
 %attr(0755,smartmet,smartmet) %{smartmetroot}/run/data/ecmwf/bin/update-opendata-awscli.sh
 %attr(0755,smartmet,smartmet) %{smartmetroot}/run/data/ecmwf/bin/update-opendata-python.sh
 %attr(0755,smartmet,smartmet) %{smartmetroot}/run/data/ecmwf/bin/ecmwf-opendata.py
@@ -249,6 +252,15 @@ install -m 644 %_topdir/SOURCES/smartmet-data-models/arpege/arpege-pressure.cnf 
 rm -rf $RPM_BUILD_ROOT
 
 %changelog
+* Sun Oct 25 2026 Elmeri Nurmi <elmeri.nurmi@fmi.fi> 26.10.25-1%{?dist}.fmi
+- Add ECMWF update-opendata.sh: single curl + jq open data downloader
+  that fetches only the selected fields via .index byte ranges; selectable
+  resolution (0p1/0p25), cycles, steps, surface/pressure parameters and
+  pressure levels; AWS preferred with delayed fallback to data.ecmwf.int;
+  cycles are published to the incoming directory only when complete
+- Add OPENDATA_* settings block to ecmwf.cnf
+- Require jq for the ECMWF subpackage
+
 * Fri Sep 25 2026 Elmeri Nurmi <elmeri.nurmi@fmi.fi> 26.9.25-1%{?dist}.fmi
 - ingest-model.sh: run st.<level>.d qdscript post-processing for pressure
   and hybrid levels, not only surface
