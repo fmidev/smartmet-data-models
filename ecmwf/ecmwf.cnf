@@ -4,9 +4,9 @@ MODEL_ID=240
 # Default world modify crop to match a smaller domain if needed.
 AREA=world
 
-# To crop are to a smaller domain example Bhutan area.
+# To crop area to a smaller domain, example Finland.
 #CROP=LEFT,BOTTOM,RIGHT,TOP
-#CROP=61,7,103,40
+#CROP=19,59,32,71
 
 # ---------------------------------------------------------------------------
 # DATA SOURCE — uncomment one block and the matching UPDATE_SCRIPT line
@@ -22,8 +22,8 @@ MODEL_RAW_MASK='\*.bin'
 
 # ECMWF open data via curl + jq (byte-range download of selected fields only).
 # Sources are tried in order; AWS is preferred, data.ecmwf.int is used only
-# when it has had the cycle for OPENDATA_FALLBACK_DELAY minutes and AWS not.
-# Domain cropping is done at querydata conversion with CROP above.
+# when it has had the cycle for OPENDATA_FALLBACK_DELAY minutes and AWS not,
+# or when downloads from AWS have kept failing (throttling) for that long.
 # Requires: curl, jq
 #MODEL_RAW_ROOT='/smartmet/data/incoming/ecmwf'
 #MODEL_RAW_DIR=''
@@ -40,6 +40,7 @@ MODEL_RAW_MASK='\*.bin'
 #OPENDATA_PL_LEVELS="1000,925,850,700,600,500,400,300,250,200,150,100,50"
 #OPENDATA_JOBS=4                       # steps downloaded in parallel
 #OPENDATA_FALLBACK_DELAY=60            # minutes before using a later source
+#OPENDATA_MAX_RUNTIME=45               # minutes per run before leaving steps to next run
 
 # ECMWF open data via AWS CLI (s3://ecmwf-forecasts)
 # Requires: awscli

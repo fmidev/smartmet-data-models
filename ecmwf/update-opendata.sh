@@ -10,11 +10,13 @@
 # preferred because it is usually faster than data.ecmwf.int from locations
 # with a slow connection to the ECMWF data centre. A later source is only
 # used when it has had the data for OPENDATA_FALLBACK_DELAY minutes and the
-# earlier ones still do not.
+# earlier ones still do not, or when downloading a step from the earlier
+# source has kept failing (e.g. S3 throttling) for that long.
 #
 # Meant to be polled from cron through ingest-model.sh
 # (UPDATE_SCRIPT=update-opendata.sh). A run with nothing new to do costs one
-# S3 listing request. Step files are staged under $INCOMING/.opendata/<RT>/
+# S3 listing request. A run stops starting new steps after
+# OPENDATA_MAX_RUNTIME minutes; the next run continues. Step files are staged under $INCOMING/.opendata/<RT>/
 # and moved into $INCOMING only when the whole cycle is complete, so
 # ingest-model.sh never converts a partial cycle. Area cropping is done by
 # ingest-model.sh when converting to querydata (CROP in ecmwf.cnf).
@@ -27,6 +29,8 @@
 # https://www.ecmwf.int/en/forecasts/datasets/open-data
 #
 set -euo pipefail
+
+START=$(date +%s)
 
 if [ -d /smartmet ]; then
     BASE=/smartmet
@@ -71,6 +75,7 @@ OPENDATA_PL_LEVELS=${OPENDATA_PL_LEVELS:-"1000,925,850,700,600,500,400,300,250,2
 OPENDATA_JOBS=${OPENDATA_JOBS:-4}
 OPENDATA_RETRIES=${OPENDATA_RETRIES:-5}
 OPENDATA_FALLBACK_DELAY=${OPENDATA_FALLBACK_DELAY:-60}
+OPENDATA_MAX_RUNTIME=${OPENDATA_MAX_RUNTIME:-45}
 INCOMING=${OPENDATA_INCOMING:-${MODEL_RAW_ROOT:-$BASE/data/incoming/ecmwf}}
 
 # Last step ECMWF publishes per cycle (same for 0p1 and 0p25)
@@ -279,7 +284,8 @@ fetch_step() {
 
         # One curl run per file reuses the connection for all ranges
         cfg=$tmp/curl_$g.cfg
-        : > "$cfg"
+        # Give up the step at the first failed range, the rest would fail too
+        echo "fail-early" > "$cfg"
         i=0
         while read -r s e; do
             [ $i -gt 0 ] && echo "next" >> "$cfg"
@@ -389,37 +395,75 @@ source_ready() {
     fi
 }
 
+# True when downloading the step from source idx has kept failing for
+# OPENDATA_FALLBACK_DELAY minutes (fail_<SSS>_<idx> is touched on the first
+# failure)
+failing_long() {
+    local fail=$WORK/fail_$1_$2
+    [ -e "$fail" ] && [ $(( ($(date +%s) - $(stat -c %Y "$fail")) / 60 )) -ge "$OPENDATA_FALLBACK_DELAY" ]
+}
+
 JOBS=()
 declare -A READY=()
 todo=0
 for s in "${STEPS[@]}"; do
-    [ -e "$WORK/done_$(printf '%03d' "$s")" ] && continue
+    sss=$(printf '%03d' "$s")
+    [ -e "$WORK/done_$sss" ] && continue
     todo=$((todo + 1))
+    pick="" retry_pick="" skipped=0
     for i in "${!SOURCES[@]}"; do
         src=${SOURCES[$i]}
         [[ " ${AVAIL[$src]} " == *" $s "* ]] || continue
-        if [ -z "${READY[$i]:-}" ]; then
-            if source_ready "$i"; then READY[$i]=1; else READY[$i]=0; fi
+        # An earlier source has failed long enough: no catch-up wait
+        if [ $skipped = 0 ]; then
+            if [ -z "${READY[$i]:-}" ]; then
+                if source_ready "$i"; then READY[$i]=1; else READY[$i]=0; fi
+            fi
+            [ "${READY[$i]}" = 1 ] || continue
         fi
-        if [ "${READY[$i]}" = 1 ]; then
-            JOBS+=("$s $src")
-            break
+        if failing_long "$sss" "$i"; then
+            [ -n "$retry_pick" ] || retry_pick=$i
+            skipped=1
+            continue
         fi
+        pick=$i
+        break
     done
+    # Every usable source keeps failing: keep retrying the preferred one
+    pick=${pick:-$retry_pick}
+    [ -n "$pick" ] || continue
+    if [ "$skipped" = 1 ] && [ "$pick" != "$retry_pick" ]; then
+        log "Step $sss: ${SOURCES[$retry_pick]} failing for over $OPENDATA_FALLBACK_DELAY min, using ${SOURCES[$pick]}"
+    fi
+    JOBS+=("$s ${SOURCES[$pick]} $pick")
 done
 log "$((${#STEPS[@]} - todo))/${#STEPS[@]} steps done, ${#JOBS[@]} to download now"
 
 if [ ${#JOBS[@]} -gt 0 ]; then
     export -f fetch_step source_url file_suffix key_base log
     export RT WORK DRYRUN OPENDATA_RESOL OPENDATA_RETRIES SFC_JSON PL_JSON LEV_JSON
+    export DEADLINE=$((START + OPENDATA_MAX_RUNTIME * 60))
     export LEVGROUPS_STR="${LEVGROUPS[*]}" CURL_OPTS_STR="${CURL_OPTS[*]}"
     rm -f "$WORK/missing"
     printf '%s\n' "${JOBS[@]}" | xargs -P "$OPENDATA_JOBS" -L 1 bash -c '
         set -uo pipefail
         read -ra LEVGROUPS <<< "$LEVGROUPS_STR"
         read -ra CURL_OPTS <<< "$CURL_OPTS_STR"
-        fetch_step "$@"' _ > "$WORK/jobs.out" || true
-    grep -v '^DRYRUN ' "$WORK/jobs.out" || true
+        if [ "$(date +%s)" -ge "$DEADLINE" ]; then
+            echo "SKIP $1"
+            exit 0
+        fi
+        if ! fetch_step "$1" "$2"; then
+            fail=$WORK/fail_$(printf "%03d" "$1")_$3
+            [ "$DRYRUN" = 1 ] || [ -e "$fail" ] || touch "$fail"
+            echo "FAIL $1"
+        fi' _ > "$WORK/jobs.out" || true
+    grep -v '^DRYRUN \|^SKIP \|^FAIL ' "$WORK/jobs.out" || true
+
+    nfail=$(grep -c '^FAIL ' "$WORK/jobs.out" || true)
+    nskip=$(grep -c '^SKIP ' "$WORK/jobs.out" || true)
+    [ "$nfail" -eq 0 ] || log "WARNING: $nfail steps failed, retrying on next run"
+    [ "$nskip" -eq 0 ] || log "WARNING: OPENDATA_MAX_RUNTIME $OPENDATA_MAX_RUNTIME min reached, $nskip steps left for next run"
 
     if [ "$DRYRUN" = 1 ]; then
         awk '/^DRYRUN/ { f += $4; r += $5; b += $6 }

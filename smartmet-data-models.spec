@@ -2,7 +2,7 @@
 
 Name:           smartmet-data-models
 Version:        26.10.25
-Release:        1%{?dist}.fmi
+Release:        2%{?dist}.fmi
 Summary:        SmartMet Data Models Common
 Group:          System Environment/Base
 License:        MIT
@@ -252,6 +252,13 @@ install -m 644 %_topdir/SOURCES/smartmet-data-models/arpege/arpege-pressure.cnf 
 rm -rf $RPM_BUILD_ROOT
 
 %changelog
+* Sun Oct 25 2026 Elmeri Nurmi <elmeri.nurmi@fmi.fi> 26.10.25-2%{?dist}.fmi
+- update-opendata.sh: when a step keeps failing on a source (e.g. S3
+  throttling) for OPENDATA_FALLBACK_DELAY minutes, use the next source;
+  stop a step at its first failed range; OPENDATA_MAX_RUNTIME limits how
+  long one run keeps starting new steps
+- ecmwf.cnf: Finland as the CROP example
+
 * Sun Oct 25 2026 Elmeri Nurmi <elmeri.nurmi@fmi.fi> 26.10.25-1%{?dist}.fmi
 - Add ECMWF update-opendata.sh: single curl + jq open data downloader
   that fetches only the selected fields via .index byte ranges; selectable
