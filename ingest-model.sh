@@ -103,7 +103,9 @@ else
     exit 1
 fi
 
-LOGFILE=$BASE/logs/data/${MODEL}_${AREA}_$(date -u +%H).log
+# Hour and minute in the name: models polled more often than hourly keep
+# one log per run for a day
+LOGFILE=$BASE/logs/data/${MODEL}_${AREA}_$(date -u +%H%M).log
 
 # Use log file if not run interactively
 if [ "${TERM:-}" = "dumb" ]; then
@@ -353,7 +355,7 @@ if [ -z $FORCE ]; then
 	    log INFO "$(basename $OUTFILE_SFC) is incomplete"
     fi
 
-    if [ -s "$OUTFILE_PL" ] && [ $(eval gribstepcount "$INFILE_PL") -eq $(qdstepcount "$OUTFILE_PL") ]; then
+    if [ -s "$OUTFILE_PL" ] && [ $(gribstepcount "$INFILE_PL") -eq $(qdstepcount "$OUTFILE_PL") ]; then
 	    log INFO "$(basename "$OUTFILE_PL") is complete"
 	    PLDONE=1
     else
@@ -361,7 +363,7 @@ if [ -z $FORCE ]; then
     fi
 
     if [ -n "${MODEL_RAW_ML:-}" ]; then
-        if [ -s "$OUTFILE_ML" ] && [ $(eval gribstepcount "$INFILE_ML") -eq $(qdstepcount "$OUTFILE_ML") ]; then
+        if [ -s "$OUTFILE_ML" ] && [ $(gribstepcount "$INFILE_ML") -eq $(qdstepcount "$OUTFILE_ML") ]; then
 	        log INFO "$(basename "$OUTFILE_ML") is complete"
 	        MLDONE=1
         else
