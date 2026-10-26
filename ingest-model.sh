@@ -103,7 +103,9 @@ else
     exit 1
 fi
 
-LOGFILE=$BASE/logs/data/${MODEL}_${AREA}_$(date -u +%H).log
+# Hour and minute in the name: models polled more often than hourly keep
+# one log per run for a day
+LOGFILE=$BASE/logs/data/${MODEL}_${AREA}_$(date -u +%H%M).log
 
 # Use log file if not run interactively
 if [ "${TERM:-}" = "dumb" ]; then

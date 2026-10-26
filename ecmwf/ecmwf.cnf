@@ -40,7 +40,7 @@ MODEL_RAW_MASK='\*.bin'
 #OPENDATA_PL_LEVELS="1000,925,850,700,600,500,400,300,250,200,150,100,50"
 #OPENDATA_JOBS=2                       # steps downloaded in parallel
 #OPENDATA_FALLBACK_DELAY=60            # minutes before using a later source
-#OPENDATA_RETRIES=5                    # curl retries per request, waits double each time
+#OPENDATA_RETRIES=8                    # curl retries per request, waits double each time
 #OPENDATA_MAX_RUNTIME=30               # minutes per run before leaving steps to next run;
                                       # steps already running finish after it
 

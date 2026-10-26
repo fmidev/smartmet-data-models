@@ -257,9 +257,13 @@ rm -rf $RPM_BUILD_ROOT
   expanded the input glob so only the first GRIB file was counted, the
   output was always incomplete and was re-converted and re-distributed on
   every run
-- update-opendata.sh: default OPENDATA_JOBS to 2 (S3 throttling) and
-  OPENDATA_MAX_RUNTIME to 30 min, leaving time for steps still running
-  and the querydata conversion before the next hourly run
+- update-opendata.sh: default OPENDATA_JOBS to 2 (S3 throttling),
+  OPENDATA_MAX_RUNTIME to 30 min and OPENDATA_RETRIES to 8 (about 4 min
+  of backoff per request)
+- ecmwf.cron: run every 15 minutes so throttled steps are retried sooner;
+  flock skips a run while the previous one is still going
+- ingest-model.sh: log file name includes minutes (HHMM) so runs within
+  the same hour do not overwrite each other's log
 
 * Sun Oct 25 2026 Elmeri Nurmi <elmeri.nurmi@fmi.fi> 26.10.25-3%{?dist}.fmi
 - update-opendata.sh: remove state of older cycles from
