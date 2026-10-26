@@ -1,8 +1,8 @@
 %define smartmetroot /smartmet
 
 Name:           smartmet-data-models
-Version:        26.10.25
-Release:        3%{?dist}.fmi
+Version:        26.10.26
+Release:        1%{?dist}.fmi
 Summary:        SmartMet Data Models Common
 Group:          System Environment/Base
 License:        MIT
@@ -252,6 +252,15 @@ install -m 644 %_topdir/SOURCES/smartmet-data-models/arpege/arpege-pressure.cnf 
 rm -rf $RPM_BUILD_ROOT
 
 %changelog
+* Mon Oct 26 2026 Elmeri Nurmi <elmeri.nurmi@fmi.fi> 26.10.26-1%{?dist}.fmi
+- ingest-model.sh: fix pressure and hybrid level completeness check; eval
+  expanded the input glob so only the first GRIB file was counted, the
+  output was always incomplete and was re-converted and re-distributed on
+  every run
+- update-opendata.sh: default OPENDATA_JOBS to 2 (S3 throttling) and
+  OPENDATA_MAX_RUNTIME to 30 min, leaving time for steps still running
+  and the querydata conversion before the next hourly run
+
 * Sun Oct 25 2026 Elmeri Nurmi <elmeri.nurmi@fmi.fi> 26.10.25-3%{?dist}.fmi
 - update-opendata.sh: remove state of older cycles from
   incoming/.opendata (staged files of cycles replaced by a newer one

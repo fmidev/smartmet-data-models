@@ -38,10 +38,11 @@ MODEL_RAW_MASK='\*.bin'
 #OPENDATA_SFC_PARAMS="2t,2d,msl,10u,10v,tp,tcc,mucape,ptype,sd,z"  # empty = no surface
 #OPENDATA_PL_PARAMS="gh,t,r,u,v,w"     # empty = no pressure levels
 #OPENDATA_PL_LEVELS="1000,925,850,700,600,500,400,300,250,200,150,100,50"
-#OPENDATA_JOBS=4                       # steps downloaded in parallel
+#OPENDATA_JOBS=2                       # steps downloaded in parallel
 #OPENDATA_FALLBACK_DELAY=60            # minutes before using a later source
 #OPENDATA_RETRIES=5                    # curl retries per request, waits double each time
-#OPENDATA_MAX_RUNTIME=45               # minutes per run before leaving steps to next run
+#OPENDATA_MAX_RUNTIME=30               # minutes per run before leaving steps to next run;
+                                      # steps already running finish after it
 
 # ECMWF open data via AWS CLI (s3://ecmwf-forecasts)
 # Requires: awscli
